@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { ArrowUp, MessageSquare, MapPin, Trash2, Droplet, TrafficCone, SprayCan } from 'lucide-react';
+import { ArrowUp, MessageSquare, MapPin, Trash2, Droplet, TrafficCone, SprayCan, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -41,7 +41,7 @@ const getUserById = (userId: string): User | undefined => {
 
 export function ComplaintCard({ complaint }: { complaint: Complaint }) {
   const { user } = useAuth();
-  const { toggleUpvote, addComment } = useComplaints();
+  const { toggleUpvote, addComment, deleteComment } = useComplaints();
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
 
@@ -128,18 +128,29 @@ export function ComplaintCard({ complaint }: { complaint: Complaint }) {
                     comments.map(comment => {
                         const commentUser = getUserById(comment.userId);
                         return (
-                            <div key={comment.id} className="flex items-start gap-3">
+                            <div key={comment.id} className="flex items-start gap-3 group">
                                 <Avatar className="h-8 w-8">
                                     <AvatarImage src={commentUser?.avatarUrl} alt={commentUser?.name} />
                                     <AvatarFallback>{commentUser?.name.charAt(0)}</AvatarFallback>
                                 </Avatar>
-                                <div>
+                                <div className="flex-grow">
                                     <div className="flex items-center gap-2">
                                         <span className="font-semibold text-sm">{commentUser?.name}</span>
                                         <span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}</span>
                                     </div>
                                     <p className="text-sm">{comment.text}</p>
                                 </div>
+                                {user && user.id === comment.userId && (
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-6 w-6 opacity-0 group-hover:opacity-100"
+                                      onClick={() => deleteComment(complaint.id, comment.id)}
+                                    >
+                                      <X className="h-4 w-4 text-muted-foreground" />
+                                      <span className="sr-only">Delete comment</span>
+                                    </Button>
+                                )}
                             </div>
                         )
                     })

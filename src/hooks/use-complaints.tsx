@@ -14,6 +14,7 @@ interface ComplaintsContextType {
   addFeedback: (complaintId: string, feedback: Feedback) => void;
   toggleUpvote: (complaintId: string) => void;
   addComment: (complaintId: string, comment: Comment) => void;
+  deleteComment: (complaintId: string, commentId: string) => void;
 }
 
 const ComplaintsContext = createContext<ComplaintsContextType | undefined>(undefined);
@@ -140,7 +141,27 @@ export function ComplaintsProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
-  const value = useMemo(() => ({ complaints, addComplaint, updateComplaintStatus, updateComplaint, addComplaintImage, addFeedback, toggleUpvote, addComment }), [complaints, addComplaint, updateComplaintStatus, updateComplaint, addComplaintImage, addFeedback, toggleUpvote, addComment]);
+  const deleteComment = useCallback((complaintId: string, commentId: string) => {
+    if (!user) return; // Must be logged in
+
+    setComplaints(prev =>
+      prev.map(c => {
+        if (c.id === complaintId) {
+          const commentToDelete = c.comments?.find(comment => comment.id === commentId);
+          // Only allow user to delete their own comment
+          if (commentToDelete && commentToDelete.userId === user.id) {
+            return {
+              ...c,
+              comments: c.comments.filter(comment => comment.id !== commentId),
+            };
+          }
+        }
+        return c;
+      })
+    );
+  }, [user]);
+
+  const value = useMemo(() => ({ complaints, addComplaint, updateComplaintStatus, updateComplaint, addComplaintImage, addFeedback, toggleUpvote, addComment, deleteComment }), [complaints, addComplaint, updateComplaintStatus, updateComplaint, addComplaintImage, addFeedback, toggleUpvote, addComment, deleteComment]);
 
   return (
     <ComplaintsContext.Provider value={value}>
