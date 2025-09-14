@@ -1,3 +1,58 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "complaint-1-before",
+      "description": "Overflowing garbage can on a city street.",
+      "imageUrl": "https://picsum.photos/seed/complaint1-before/600/400",
+      "imageHint": "overflowing garbage"
+    },
+    {
+      "id": "complaint-1-after",
+      "description": "Clean street corner with an empty garbage can.",
+      "imageUrl": "https://picsum.photos/seed/complaint1-after/600/400",
+      "imageHint": "clean street"
+    },
+    {
+      "id": "complaint-2-before",
+      "description": "Large pothole in an asphalt road.",
+      "imageUrl": "https://picsum.photos/seed/complaint2-before/600/400",
+      "imageHint": "road pothole"
+    },
+    {
+      "id": "complaint-3-before",
+      "description": "Graffiti on a brick wall.",
+      "imageUrl": "https://picsum.photos/seed/complaint3-before/600/400",
+      "imageHint": "wall graffiti"
+    },
+    {
+      "id": "complaint-5-before",
+      "description": "Water leaking from a crack in the sidewalk.",
+      "imageUrl": "https://picsum.photos/seed/complaint5-before/600/400",
+      "imageHint": "water leak"
+    },
+    {
+      "id": "complaint-5-after",
+      "description": "A dry, repaired sidewalk.",
+      "imageUrl": "https://picsum.photos/seed/complaint5-after/600/400",
+      "imageHint": "repaired sidewalk"
+    },
+    {
+      "id": "avatar-1",
+      "description": "Portrait of a man.",
+      "imageUrl": "https://picsum.photos/seed/avatar1/100/100",
+      "imageHint": "man portrait"
+    },
+    {
+      "id": "avatar-2",
+      "description": "Portrait of a woman.",
+      "imageUrl": "https://picsum.photos/seed/avatar2/100/100",
+      "imageHint": "woman portrait"
+    },
+    {
+      "id": "login-hero",
+      "description": "A vibrant city street with blurred motion.",
+      "imageUrl": "https://picsum.photos/seed/loginhero/1200/800",
+      "imageHint": "city street"
+    }
+  ]
 }

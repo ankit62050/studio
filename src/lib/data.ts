@@ -1,0 +1,74 @@
+import type { User, Complaint } from './types';
+
+export const users: User[] = [
+  {
+    id: 'user-1',
+    name: 'John Citizen',
+    email: 'john.citizen@example.com',
+    role: 'citizen',
+    avatarUrl: 'https://picsum.photos/seed/avatar1/100/100',
+  },
+  {
+    id: 'user-2',
+    name: 'Jane Admin',
+    email: 'jane.admin@example.com',
+    role: 'admin',
+    avatarUrl: 'https://picsum.photos/seed/avatar2/100/100',
+  },
+];
+
+export const complaints: Complaint[] = [
+  {
+    id: 'complaint-1',
+    userId: 'user-1',
+    category: 'Garbage',
+    description: 'Overflowing dustbin on the corner of Main St and 1st Ave. It has not been collected for over a week and is attracting pests.',
+    location: 'Main St & 1st Ave',
+    status: 'Resolved',
+    submittedAt: '2024-07-15T09:30:00Z',
+    resolvedAt: '2024-07-18T14:00:00Z',
+    beforeImageUrl: 'https://picsum.photos/seed/complaint1-before/600/400',
+    afterImageUrl: 'https://picsum.photos/seed/complaint1-after/600/400',
+  },
+  {
+    id: 'complaint-2',
+    userId: 'user-1',
+    category: 'Pothole',
+    description: 'A large and dangerous pothole has formed on Elm Street, right in front of the public library. It poses a risk to cars and cyclists.',
+    location: 'Elm Street, near Public Library',
+    status: 'Work in Progress',
+    submittedAt: '2024-07-20T11:00:00Z',
+    beforeImageUrl: 'https://picsum.photos/seed/complaint2-before/600/400',
+  },
+  {
+    id: 'complaint-3',
+    userId: 'user-1',
+    category: 'Graffiti',
+    description: 'Offensive graffiti has been sprayed on the park wall at Central Park. Needs to be cleaned up as soon as possible.',
+    location: 'Central Park',
+    status: 'Under Review',
+    submittedAt: '2024-07-22T18:45:00Z',
+    beforeImageUrl: 'https://picsum.photos/seed/complaint3-before/600/400',
+  },
+  {
+    id: 'complaint-4',
+    userId: 'user-1',
+    category: 'Traffic Light',
+    description: 'The traffic light at the intersection of Oak and Pine is malfunctioning. The pedestrian signal is not working.',
+    location: 'Intersection of Oak and Pine',
+    status: 'Received',
+    submittedAt: '2024-07-23T08:00:00Z',
+  },
+  {
+    id: 'complaint-5',
+    userId: 'user-1',
+    category: 'Water Leak',
+    description: 'There is a significant water leak on the sidewalk on Maple Avenue. Water has been flowing for hours.',
+    location: 'Maple Avenue',
+    status: 'Resolved',
+    submittedAt: '2024-07-10T15:20:00Z',
+    resolvedAt: '2024-07-11T10:00:00Z',
+    beforeImageUrl: 'https://picsum.photos/seed/complaint5-before/600/400',
+    afterImageUrl: 'https://picsum.photos/seed/complaint5-after/600/400',
+  },
+];
