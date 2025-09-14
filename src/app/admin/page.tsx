@@ -209,28 +209,28 @@ export default function AdminDashboardPage() {
         <Card onClick={() => setActiveFilter('Pending')} className={cn("cursor-pointer transition-shadow hover:shadow-md", activeFilter === 'Pending' && "ring-2 ring-primary")}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Pending</CardTitle>
-            <Hourglass className="h-4 w-4 text-muted-foreground" />
+            <Hourglass className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{pendingCount}</div>
+            <div className="text-2xl font-bold text-primary">{pendingCount}</div>
           </CardContent>
         </Card>
         <Card onClick={() => setActiveFilter('Work in Progress')} className={cn("cursor-pointer transition-shadow hover:shadow-md", activeFilter === 'Work in Progress' && "ring-2 ring-primary")}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Work in Progress</CardTitle>
-            <BarChart className="h-4 w-4 text-muted-foreground" />
+            <BarChart className="h-4 w-4 text-info" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{statusCounts['Work in Progress']}</div>
+            <div className="text-2xl font-bold text-info">{statusCounts['Work in Progress']}</div>
           </CardContent>
         </Card>
         <Card onClick={() => setActiveFilter('Resolved')} className={cn("cursor-pointer transition-shadow hover:shadow-md", activeFilter === 'Resolved' && "ring-2 ring-primary")}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Resolved</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-600" />
+            <CheckCircle className="h-4 w-4 text-accent" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{statusCounts['Resolved']}</div>
+            <div className="text-2xl font-bold text-accent">{statusCounts['Resolved']}</div>
           </CardContent>
         </Card>
       </div>

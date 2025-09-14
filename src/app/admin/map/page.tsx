@@ -18,12 +18,12 @@ const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ss
 const getStatusColor = (status: Complaint['status']) => {
     switch (status) {
         case 'Resolved':
-            return '#138808'; // Green
+            return 'hsl(var(--accent))';
         case 'Work in Progress':
-            return '#000080'; // Ashoka Blue
+            return 'hsl(var(--info))';
         case 'Under Review':
         case 'Received':
-            return '#FF9933'; // Saffron
+            return 'hsl(var(--primary))';
         default:
             return '#808080'; // Gray
     }
@@ -109,28 +109,28 @@ export default function AdminMapPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Pending</CardTitle>
-            <Hourglass className="h-4 w-4" style={{ color: '#FF9933' }}/>
+            <Hourglass className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" style={{ color: '#FF9933' }}>{pendingCount}</div>
+            <div className="text-2xl font-bold text-primary">{pendingCount}</div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">In Progress</CardTitle>
-            <BarChart className="h-4 w-4" style={{ color: '#000080' }}/>
+            <BarChart className="h-4 w-4 text-info" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" style={{ color: '#000080' }}>{inProgressCount}</div>
+            <div className="text-2xl font-bold text-info">{inProgressCount}</div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Resolved</CardTitle>
-            <CheckCircle className="h-4 w-4" style={{ color: '#138808' }}/>
+            <CheckCircle className="h-4 w-4 text-accent" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" style={{ color: '#138808' }}>{resolvedCount}</div>
+            <div className="text-2xl font-bold text-accent">{resolvedCount}</div>
           </CardContent>
         </Card>
       </div>

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Home, PlusCircle, History, User, Shield, Users } from 'lucide-react';
+import { Home, PlusCircle, History, User, Shield, Users, Map } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 
 export function MobileNav() {
@@ -20,7 +20,7 @@ export function MobileNav() {
 
   const adminRoutes = [
     { href: '/admin', label: 'Dashboard', icon: Shield },
-    { href: '/admin/map', label: 'Map', icon: Home },
+    { href: '/admin/map', label: 'Map', icon: Map },
     { href: '/community', label: 'Community', icon: Users },
     { href: '/profile', label: 'Profile', icon: User },
   ];
