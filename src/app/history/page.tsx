@@ -1,10 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -13,6 +15,12 @@ import { Complaint, ComplaintStatus } from '@/lib/types';
 import { format } from 'date-fns';
 import Image from 'next/image';
 import { useComplaints } from '@/hooks/use-complaints';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Star } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const getStatusColor = (status: ComplaintStatus) => {
   switch (status) {
@@ -28,6 +36,62 @@ const getStatusColor = (status: ComplaintStatus) => {
       return 'bg-gray-100 text-gray-800';
   }
 };
+
+function FeedbackForm({ complaintId, onSubmit }: { complaintId: string, onSubmit: () => void }) {
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const { addFeedback } = useComplaints();
+  const { toast } = useToast();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (rating === 0) {
+      toast({
+        variant: 'destructive',
+        title: 'Rating Required',
+        description: 'Please select a rating before submitting.',
+      });
+      return;
+    }
+    addFeedback(complaintId, { rating, comment });
+    toast({
+      title: 'Feedback Submitted!',
+      description: 'Thank you for your feedback.',
+    });
+    onSubmit();
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4 pt-4 border-t">
+      <h4 className="font-semibold">Submit Feedback</h4>
+      <div>
+        <Label className="mb-2 block">Rating</Label>
+        <div className="flex gap-2">
+            {[1, 2, 3, 4, 5].map((value) => (
+                <Star
+                    key={value}
+                    className={`h-6 w-6 cursor-pointer transition-colors ${
+                        value <= rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'
+                    }`}
+                    onClick={() => setRating(value)}
+                />
+            ))}
+        </div>
+      </div>
+      <div>
+        <Label htmlFor={`comment-${complaintId}`}>Comments (optional)</Label>
+        <Textarea
+          id={`comment-${complaintId}`}
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          placeholder="Tell us about your experience..."
+        />
+      </div>
+      <Button type="submit">Submit Feedback</Button>
+    </form>
+  );
+}
+
 
 export default function HistoryPage() {
   const { user } = useAuth();
@@ -95,8 +159,33 @@ export default function HistoryPage() {
                         </div>
                     </div>
                 )}
+                 {complaint.status === 'Resolved' && (
+                  <>
+                    {complaint.feedback ? (
+                      <div className="pt-4 border-t">
+                        <h4 className="font-semibold">Your Feedback</h4>
+                        <div className="flex items-center gap-2 mt-2">
+                           <div className="flex">
+                            {[1, 2, 3, 4, 5].map((value) => (
+                                <Star
+                                    key={value}
+                                    className={`h-5 w-5 ${
+                                        value <= complaint.feedback.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'
+                                    }`}
+                                />
+                            ))}
+                           </div>
+                           <span className="text-sm font-bold">({complaint.feedback.rating}/5)</span>
+                        </div>
+                        <p className="text-muted-foreground mt-2">{complaint.feedback.comment}</p>
+                      </div>
+                    ) : (
+                      <FeedbackForm complaintId={complaint.id} onSubmit={() => {}}/>
+                    )}
+                  </>
+                )}
 
-                <div className="text-sm text-muted-foreground flex justify-between">
+                <div className="text-sm text-muted-foreground flex justify-between pt-4 border-t">
                   <span>
                     Submitted: {format(new Date(complaint.submittedAt), 'PPp')}
                   </span>

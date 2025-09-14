@@ -21,11 +21,12 @@ import {
 import { Complaint, ComplaintStatus, complaintStatuses, User } from '@/lib/types';
 import { users } from '@/lib/data';
 import { format } from 'date-fns';
-import { BarChart, FileText, Hourglass, CheckCircle, Camera } from 'lucide-react';
+import { BarChart, FileText, Hourglass, CheckCircle, Camera, Star } from 'lucide-react';
 import Image from 'next/image';
 import { useComplaints } from '@/hooks/use-complaints';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 export default function AdminDashboardPage() {
   const { complaints, updateComplaintStatus, addComplaintImage } = useComplaints();
@@ -133,6 +134,7 @@ export default function AdminDashboardPage() {
                 <TableHead>Location</TableHead>
                 <TableHead>Submitted</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Feedback</TableHead>
                 <TableHead>Images</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -171,6 +173,30 @@ export default function AdminDashboardPage() {
                           ))}
                         </SelectContent>
                       </Select>
+                    </TableCell>
+                     <TableCell>
+                      {complaint.feedback ? (
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" size="sm" className="flex items-center gap-2">
+                              <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                              <span>{complaint.feedback.rating}/5</span>
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-80">
+                            <div className="grid gap-4">
+                              <div className="space-y-2">
+                                <h4 className="font-medium leading-none">Feedback</h4>
+                                <p className="text-sm text-muted-foreground">
+                                  {complaint.feedback.comment}
+                                </p>
+                              </div>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">N/A</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">

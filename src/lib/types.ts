@@ -26,6 +26,12 @@ export const complaintStatuses = [
 
 export type ComplaintStatus = (typeof complaintStatuses)[number];
 
+export type Feedback = {
+  rating: number; // e.g., 1-5
+  comment: string;
+};
+
+
 export type Complaint = {
   id: string;
   userId: string;
@@ -38,4 +44,5 @@ export type Complaint = {
   beforeImageUrl?: string;
   afterImageUrl?: string;
   progressImageUrls?: { status: ComplaintStatus, imageUrl: string }[];
+  feedback?: Feedback;
 };
