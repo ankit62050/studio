@@ -12,18 +12,35 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-type SortOption = 'upvotes' | 'recent';
+type SortOption = 'priority' | 'upvotes' | 'recent' | 'locality';
 
 export default function CommunityPage() {
   const { complaints } = useComplaints();
-  const [sortOption, setSortOption] = useState<SortOption>('upvotes');
+  const [sortOption, setSortOption] = useState<SortOption>('priority');
 
   const sortedComplaints = useMemo(() => {
     const sorted = [...complaints];
-    if (sortOption === 'upvotes') {
-      sorted.sort((a, b) => (b.upvotedBy?.length || 0) - (a.upvotedBy?.length || 0));
-    } else if (sortOption === 'recent') {
-      sorted.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
+    switch (sortOption) {
+      case 'upvotes':
+        sorted.sort((a, b) => (b.upvotedBy?.length || 0) - (a.upvotedBy?.length || 0));
+        break;
+      case 'recent':
+        sorted.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
+        break;
+      case 'locality':
+        sorted.sort((a, b) => a.location.localeCompare(b.location));
+        break;
+      case 'priority':
+        // A simple priority score: 1 point per upvote, and more points for recent items
+        const getPriorityScore = (complaint: Complaint) => {
+          const upvoteScore = (complaint.upvotedBy?.length || 0) * 2;
+          const timeDiff = Date.now() - new Date(complaint.submittedAt).getTime();
+          const hoursAgo = timeDiff / (1000 * 60 * 60);
+          const recencyScore = Math.max(0, 100 - hoursAgo / 24); // More points for last 100 days
+          return upvoteScore + recencyScore;
+        };
+        sorted.sort((a, b) => getPriorityScore(b) - getPriorityScore(a));
+        break;
     }
     return sorted;
   }, [complaints, sortOption]);
@@ -44,8 +61,10 @@ export default function CommunityPage() {
                     <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
+                    <SelectItem value="priority">Priority</SelectItem>
                     <SelectItem value="upvotes">Popularity</SelectItem>
                     <SelectItem value="recent">Most Recent</SelectItem>
+                    <SelectItem value="locality">Locality</SelectItem>
                 </SelectContent>
             </Select>
         </div>
