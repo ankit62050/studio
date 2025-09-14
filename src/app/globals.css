@@ -4,22 +4,22 @@
 
 @layer base {
   :root {
-    --background: 0 0% 97.3%; /* Off-white #F8F8F8 */
+    --background: 0 0% 95%; /* Off-white #F2F2F2 */
     --foreground: 224 71.4% 4.1%;
     --card: 0 0% 100%;
     --card-foreground: 224 71.4% 4.1%;
     --popover: 0 0% 100%;
     --popover-foreground: 224 71.4% 4.1%;
     --primary: 36 100% 60%; /* Saffron #FF9933 */
-    --primary-foreground: 224 71.4% 4.1%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 220 14.3% 95.9%;
     --secondary-foreground: 220 8.9% 10%;
     --muted: 220 14.3% 95.9%;
     --muted-foreground: 220 8.9% 46.1%;
-    --accent: 140 60% 34%; /* Forest Green #228B22 */
+    --accent: 125 78% 30%; /* Forest Green #138808 */
     --accent-foreground: 0 0% 98%;
-    --info: 240 100% 50%; /* Deep Blue */
-    --destructive: 0 84.2% 60.2%;
+    --info: 240 100% 25%; /* Ashoka Chakra Blue #000080 */
+    --destructive: 356 78% 57%; /* #E63946 */
     --destructive-foreground: 0 0% 98%;
     --border: 220 13% 91%;
     --input: 220 13% 91%;
@@ -29,7 +29,7 @@
     --sidebar-background: 220 14.3% 95.9%;
     --sidebar-foreground: 224 71.4% 4.1%;
     --sidebar-primary: 36 100% 60%;
-    --sidebar-primary-foreground: 224 71.4% 4.1%;
+    --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 100%;
     --sidebar-accent-foreground: 224 71.4% 4.1%;
     --sidebar-border: 220 13% 85%;
@@ -44,15 +44,15 @@
     --popover: 224 71.4% 4.1%;
     --popover-foreground: 0 0% 98%;
     --primary: 36 100% 60%;
-    --primary-foreground: 224 71.4% 4.1%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 215 27.9% 16.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 215 27.9% 16.9%;
     --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 140 60% 34%;
+    --accent: 125 78% 30%;
     --accent-foreground: 0 0% 98%;
-    --info: 240 100% 50%; /* Deep Blue */
-    --destructive: 0 62.8% 30.6%;
+    --info: 240 100% 70%; /* Lighter blue for dark mode */
+    --destructive: 356 70% 47%;
     --destructive-foreground: 0 0% 98%;
     --border: 215 27.9% 16.9%;
     --input: 215 27.9% 16.9%;
@@ -61,7 +61,7 @@
     --sidebar-background: 224 71.4% 4.1%;
     --sidebar-foreground: 0 0% 98%;
     --sidebar-primary: 36 100% 60%;
-    --sidebar-primary-foreground: 224 71.4% 4.1%;
+    --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 215 27.9% 16.9%;
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 215 27.9% 16.9%;

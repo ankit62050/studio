@@ -44,7 +44,7 @@ export function MobileNav() {
                 isActive ? 'text-primary font-semibold' : 'text-muted-foreground hover:text-primary'
               )}
             >
-              <route.icon className="h-5 w-5" />
+              <route.icon className={cn("h-5 w-5", isActive ? "text-primary" : "text-info")} />
               <span>{route.label}</span>
             </Link>
           );
