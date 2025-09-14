@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
@@ -21,12 +21,16 @@ import {
 import { Complaint, ComplaintStatus, complaintStatuses, User } from '@/lib/types';
 import { users } from '@/lib/data';
 import { format } from 'date-fns';
-import { BarChart, FileText, Hourglass, CheckCircle } from 'lucide-react';
+import { BarChart, FileText, Hourglass, CheckCircle, Camera } from 'lucide-react';
 import Image from 'next/image';
 import { useComplaints } from '@/hooks/use-complaints';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 export default function AdminDashboardPage() {
-  const { complaints, updateComplaintStatus } = useComplaints();
+  const { complaints, updateComplaintStatus, addComplaintImage } = useComplaints();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const currentComplaintAction = useRef<{ complaintId: string; status: ComplaintStatus } | null>(null);
 
   const handleStatusChange = (complaintId: string, newStatus: ComplaintStatus) => {
     updateComplaintStatus(complaintId, newStatus);
@@ -35,6 +39,28 @@ export default function AdminDashboardPage() {
   const getUserById = (userId: string): User | undefined => {
     return users.find(u => u.id === userId);
   }
+
+  const handleAddPhotoClick = (complaintId: string, status: ComplaintStatus) => {
+    currentComplaintAction.current = { complaintId, status };
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && currentComplaintAction.current) {
+      const { complaintId, status } = currentComplaintAction.current;
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        addComplaintImage(complaintId, reader.result as string, status);
+      };
+      reader.readAsDataURL(file);
+    }
+    // Reset file input
+    if(fileInputRef.current) {
+        fileInputRef.current.value = '';
+    }
+    currentComplaintAction.current = null;
+  };
 
   const statusCounts = complaintStatuses.reduce((acc, status) => {
     acc[status] = complaints.filter(c => c.status === status).length;
@@ -64,7 +90,7 @@ export default function AdminDashboardPage() {
             <Hourglass className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{statusCounts['Under Review'] + statusCounts['Received'] + statusCounts['Work in Progress']}</div>
+            <div className="text-2xl font-bold">{statusCounts['Under Review'] + statusCounts['Received']}</div>
           </CardContent>
         </Card>
         <Card>
@@ -87,12 +113,18 @@ export default function AdminDashboardPage() {
         </Card>
       </div>
 
-
       <Card>
         <CardHeader>
           <CardTitle>All Complaints</CardTitle>
         </CardHeader>
         <CardContent>
+          <Input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+          />
           <Table>
             <TableHeader>
               <TableRow>
@@ -101,7 +133,8 @@ export default function AdminDashboardPage() {
                 <TableHead>Location</TableHead>
                 <TableHead>Submitted</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Image</TableHead>
+                <TableHead>Images</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -140,15 +173,38 @@ export default function AdminDashboardPage() {
                       </Select>
                     </TableCell>
                     <TableCell>
-                      {complaint.beforeImageUrl && (
-                        <Image
-                            src={complaint.beforeImageUrl}
-                            alt="Complaint image"
-                            width={100}
-                            height={75}
-                            className="rounded-md object-cover"
-                        />
-                      )}
+                      <div className="flex gap-2">
+                        {complaint.beforeImageUrl && (
+                            <Image
+                                src={complaint.beforeImageUrl}
+                                alt="Complaint image"
+                                width={100}
+                                height={75}
+                                className="rounded-md object-cover"
+                            />
+                        )}
+                        {complaint.afterImageUrl && (
+                            <Image
+                                src={complaint.afterImageUrl}
+                                alt="Resolved image"
+                                width={100}
+                                height={75}
+                                className="rounded-md object-cover"
+                            />
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="space-y-2">
+                        {complaint.status === 'Work in Progress' && (
+                            <Button variant="outline" size="sm" onClick={() => handleAddPhotoClick(complaint.id, 'Work in Progress')}>
+                                <Camera className="mr-2 h-4 w-4"/> Add Progress Photo
+                            </Button>
+                        )}
+                        {complaint.status === 'Resolved' && (
+                             <Button variant="outline" size="sm" onClick={() => handleAddPhotoClick(complaint.id, 'Resolved')}>
+                                <Camera className="mr-2 h-4 w-4"/> Add After Photo
+                            </Button>
+                        )}
                     </TableCell>
                   </TableRow>
                 )

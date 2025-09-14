@@ -82,6 +82,20 @@ export default function HistoryPage() {
                     )}
                 </div>
 
+                {complaint.progressImageUrls && complaint.progressImageUrls.length > 0 && (
+                    <div>
+                        <h4 className="font-semibold mb-2">Progress Updates</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {complaint.progressImageUrls.map((progress, index) => (
+                                <div key={index}>
+                                    <h5 className="font-medium text-sm text-muted-foreground mb-1">{progress.status}</h5>
+                                     <Image src={progress.imageUrl} alt={`Progress update for ${progress.status}`} width={600} height={400} className="rounded-lg object-cover"/>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 <div className="text-sm text-muted-foreground flex justify-between">
                   <span>
                     Submitted: {format(new Date(complaint.submittedAt), 'PPp')}

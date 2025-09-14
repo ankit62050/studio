@@ -37,4 +37,5 @@ export type Complaint = {
   resolvedAt?: string;
   beforeImageUrl?: string;
   afterImageUrl?: string;
+  progressImageUrls?: { status: ComplaintStatus, imageUrl: string }[];
 };

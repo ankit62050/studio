@@ -8,6 +8,7 @@ interface ComplaintsContextType {
   complaints: Complaint[];
   addComplaint: (complaint: Complaint) => void;
   updateComplaintStatus: (complaintId: string, status: ComplaintStatus) => void;
+  addComplaintImage: (complaintId: string, imageUrl: string, status: ComplaintStatus) => void;
 }
 
 const ComplaintsContext = createContext<ComplaintsContextType | undefined>(undefined);
@@ -21,11 +22,38 @@ export function ComplaintsProvider({ children }: { children: ReactNode }) {
 
   const updateComplaintStatus = useCallback((complaintId: string, status: ComplaintStatus) => {
     setComplaints(prev =>
-      prev.map(c => (c.id === complaintId ? { ...c, status } : c))
+      prev.map(c => {
+        if (c.id === complaintId) {
+          const updatedComplaint = { ...c, status };
+          if (status === 'Resolved') {
+            updatedComplaint.resolvedAt = new Date().toISOString();
+          }
+          return updatedComplaint;
+        }
+        return c;
+      })
     );
   }, []);
 
-  const value = useMemo(() => ({ complaints, addComplaint, updateComplaintStatus }), [complaints, addComplaint, updateComplaintStatus]);
+  const addComplaintImage = useCallback((complaintId: string, imageUrl: string, status: ComplaintStatus) => {
+    setComplaints(prev => prev.map(c => {
+        if (c.id !== complaintId) return c;
+
+        if (status === 'Resolved') {
+            return { ...c, afterImageUrl: imageUrl };
+        }
+
+        const newProgressImage = { status, imageUrl };
+        const existingProgressImages = c.progressImageUrls?.filter(p => p.status !== status) || [];
+        
+        return {
+            ...c,
+            progressImageUrls: [...existingProgressImages, newProgressImage],
+        };
+    }));
+  }, []);
+
+  const value = useMemo(() => ({ complaints, addComplaint, updateComplaintStatus, addComplaintImage }), [complaints, addComplaint, updateComplaintStatus, addComplaintImage]);
 
   return (
     <ComplaintsContext.Provider value={value}>
