@@ -126,117 +126,119 @@ export default function AdminDashboardPage() {
             ref={fileInputRef}
             onChange={handleFileChange}
           />
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Submitted</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Feedback</TableHead>
-                <TableHead>Images</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {complaints.map((complaint) => {
-                const user = getUserById(complaint.userId);
-                return (
-                  <TableRow key={complaint.id}>
-                    <TableCell>
-                        <div className="font-medium">{user?.name}</div>
-                        <div className="text-sm text-muted-foreground">{user?.email}</div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary">{complaint.category}</Badge>
-                    </TableCell>
-                    <TableCell>{complaint.location}</TableCell>
-                    <TableCell>
-                      {format(new Date(complaint.submittedAt), 'PPp')}
-                    </TableCell>
-                    <TableCell>
-                      <Select
-                        value={complaint.status}
-                        onValueChange={(value: ComplaintStatus) =>
-                          handleStatusChange(complaint.id, value)
-                        }
-                      >
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Set status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {complaintStatuses.map((status) => (
-                            <SelectItem key={status} value={status}>
-                              {status}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                     <TableCell>
-                      {complaint.feedback ? (
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button variant="outline" size="sm" className="flex items-center gap-2">
-                              <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                              <span>{complaint.feedback.rating}/5</span>
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-80">
-                            <div className="grid gap-4">
-                              <div className="space-y-2">
-                                <h4 className="font-medium leading-none">Feedback</h4>
-                                <p className="text-sm text-muted-foreground">
-                                  {complaint.feedback.comment}
-                                </p>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>User</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Location</TableHead>
+                  <TableHead>Submitted</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Feedback</TableHead>
+                  <TableHead>Images</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {complaints.map((complaint) => {
+                  const user = getUserById(complaint.userId);
+                  return (
+                    <TableRow key={complaint.id}>
+                      <TableCell>
+                          <div className="font-medium">{user?.name}</div>
+                          <div className="text-sm text-muted-foreground">{user?.email}</div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">{complaint.category}</Badge>
+                      </TableCell>
+                      <TableCell>{complaint.location}</TableCell>
+                      <TableCell>
+                        {format(new Date(complaint.submittedAt), 'PPp')}
+                      </TableCell>
+                      <TableCell>
+                        <Select
+                          value={complaint.status}
+                          onValueChange={(value: ComplaintStatus) =>
+                            handleStatusChange(complaint.id, value)
+                          }
+                        >
+                          <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Set status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {complaintStatuses.map((status) => (
+                              <SelectItem key={status} value={status}>
+                                {status}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell>
+                        {complaint.feedback ? (
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button variant="outline" size="sm" className="flex items-center gap-2">
+                                <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                                <span>{complaint.feedback.rating}/5</span>
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80">
+                              <div className="grid gap-4">
+                                <div className="space-y-2">
+                                  <h4 className="font-medium leading-none">Feedback</h4>
+                                  <p className="text-sm text-muted-foreground">
+                                    {complaint.feedback.comment}
+                                  </p>
+                                </div>
                               </div>
-                            </div>
-                          </PopoverContent>
-                        </Popover>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">N/A</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        {complaint.beforeImageUrl && (
-                            <Image
-                                src={complaint.beforeImageUrl}
-                                alt="Complaint image"
-                                width={100}
-                                height={75}
-                                className="rounded-md object-cover"
-                            />
+                            </PopoverContent>
+                          </Popover>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">N/A</span>
                         )}
-                        {complaint.afterImageUrl && (
-                            <Image
-                                src={complaint.afterImageUrl}
-                                alt="Resolved image"
-                                width={100}
-                                height={75}
-                                className="rounded-md object-cover"
-                            />
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="space-y-2">
-                        {complaint.status === 'Work in Progress' && (
-                            <Button variant="outline" size="sm" onClick={() => handleAddPhotoClick(complaint.id, 'Work in Progress')}>
-                                <Camera className="mr-2 h-4 w-4"/> Add Progress Photo
-                            </Button>
-                        )}
-                        {complaint.status === 'Resolved' && (
-                             <Button variant="outline" size="sm" onClick={() => handleAddPhotoClick(complaint.id, 'Resolved')}>
-                                <Camera className="mr-2 h-4 w-4"/> Add After Photo
-                            </Button>
-                        )}
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          {complaint.beforeImageUrl && (
+                              <Image
+                                  src={complaint.beforeImageUrl}
+                                  alt="Complaint image"
+                                  width={100}
+                                  height={75}
+                                  className="rounded-md object-cover"
+                              />
+                          )}
+                          {complaint.afterImageUrl && (
+                              <Image
+                                  src={complaint.afterImageUrl}
+                                  alt="Resolved image"
+                                  width={100}
+                                  height={75}
+                                  className="rounded-md object-cover"
+                              />
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="space-y-2">
+                          {complaint.status === 'Work in Progress' && (
+                              <Button variant="outline" size="sm" onClick={() => handleAddPhotoClick(complaint.id, 'Work in Progress')}>
+                                  <Camera className="mr-2 h-4 w-4"/> Add Progress Photo
+                              </Button>
+                          )}
+                          {complaint.status === 'Resolved' && (
+                              <Button variant="outline" size="sm" onClick={() => handleAddPhotoClick(complaint.id, 'Resolved')}>
+                                  <Camera className="mr-2 h-4 w-4"/> Add After Photo
+                              </Button>
+                          )}
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>
