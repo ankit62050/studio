@@ -17,6 +17,7 @@ export function MainNav({
     { href: '/', label: 'Dashboard' },
     { href: '/submit', label: 'New Complaint' },
     { href: '/history', label: 'My History' },
+    { href: '/faq', label: 'FAQ' },
     { href: '/contact', label: 'Contact Us' },
   ];
   
