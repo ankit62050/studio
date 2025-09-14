@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Logo } from '@/components/logo';
 import { UserNav } from '@/components/user-nav';
-import { Shield, Map } from 'lucide-react';
+import { Shield, Map, Mail } from 'lucide-react';
 import { Chatbot } from '../chatbot';
 
 interface AdminLayoutProps {
@@ -26,6 +26,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const routes = [
     { href: '/admin', label: 'Dashboard', icon: Shield },
     { href: '/admin/map', label: 'Map View', icon: Map },
+    { href: '/contact', label: 'Contact', icon: Mail },
   ];
 
   return (
