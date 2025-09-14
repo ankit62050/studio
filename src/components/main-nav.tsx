@@ -16,6 +16,7 @@ export function MainNav({
   const citizenRoutes = [
     { href: '/', label: 'Dashboard' },
     { href: '/community', label: 'Community' },
+    { href: '/trends', label: 'Trends' },
     { href: '/submit', label: 'New Complaint' },
     { href: '/history', label: 'My History' },
     { href: '/faq', label: 'FAQ' },
@@ -25,6 +26,7 @@ export function MainNav({
   const adminRoutes = [
     { href: '/admin', label: 'Admin Dashboard' },
     { href: '/community', label: 'Community' },
+    { href: '/trends', label: 'Trends' },
   ]
 
   const routes = user?.role === 'admin' ? adminRoutes : citizenRoutes;
