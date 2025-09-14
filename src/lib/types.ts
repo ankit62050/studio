@@ -37,6 +37,8 @@ export type Complaint = {
   category: ComplaintCategory;
   description: string;
   location: string;
+  latitude?: number;
+  longitude?: number;
   status: ComplaintStatus;
   submittedAt: string;
   resolvedAt?: string;
