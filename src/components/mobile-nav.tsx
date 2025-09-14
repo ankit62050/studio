@@ -13,6 +13,7 @@ export function MobileNav() {
   const citizenRoutes = [
     { href: '/', label: 'Home', icon: Home },
     { href: '/community', label: 'Community', icon: Users },
+    { href: '/map', label: 'Map', icon: Map },
     { href: '/submit', label: 'Submit', icon: PlusCircle },
     { href: '/history', label: 'History', icon: History },
     { href: '/profile', label: 'Profile', icon: User },
