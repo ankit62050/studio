@@ -1,12 +1,12 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Hourglass, CheckCircle, BarChart } from 'lucide-react';
 import { Complaint, ComplaintStatus, complaintStatuses } from '@/lib/types';
 import { useComplaints } from '@/hooks/use-complaints';
 import dynamic from 'next/dynamic';
-import { Icon } from 'leaflet';
+import { Icon, type Map } from 'leaflet';
 import { Badge } from '@/components/ui/badge';
 import 'leaflet/dist/leaflet.css';
 
@@ -45,6 +45,7 @@ const createCustomIcon = (color: string) => {
 
 export default function AdminMapPage() {
   const { complaints } = useComplaints();
+  const [map, setMap] = useState<Map | null>(null);
 
   const statusCounts = useMemo(() => {
     return complaintStatuses.reduce((acc, status) => {
@@ -59,35 +60,7 @@ export default function AdminMapPage() {
 
   const geoComplaints = complaints.filter(c => c.latitude && c.longitude) as (Complaint & { latitude: number; longitude: number; })[];
   
-  const MapView = useMemo(() => {
-    const defaultPosition: [number, number] = [28.6139, 77.2090]; // Centered on Delhi
-
-    return (
-        <MapContainer center={defaultPosition} zoom={12} style={{ height: '100%', width: '100%', borderRadius: '0.5rem' }}>
-            <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            />
-            {geoComplaints.map(complaint => (
-                <Marker 
-                key={complaint.id} 
-                position={[complaint.latitude, complaint.longitude]}
-                icon={createCustomIcon(getStatusColor(complaint.status))}
-                >
-                <Popup>
-                    <div className="w-64">
-                    <h4 className="font-bold text-lg">{complaint.category}</h4>
-                    <p className="text-sm text-muted-foreground mb-2">{complaint.location}</p>
-                    <Badge variant="outline" style={{ borderColor: getStatusColor(complaint.status), color: getStatusColor(complaint.status) }}>{complaint.status}</Badge>
-                    <p className="mt-2 text-sm">{complaint.description}</p>
-                    </div>
-                </Popup>
-                </Marker>
-            ))}
-        </MapContainer>
-    );
-}, [geoComplaints]);
-
+  const defaultPosition: [number, number] = [28.6139, 77.2090]; // Centered on Delhi
 
   return (
     <div className="space-y-8">
@@ -137,7 +110,28 @@ export default function AdminMapPage() {
       
       <Card>
         <CardContent className="p-2 h-[60vh]">
-          {MapView}
+           <MapContainer whenCreated={setMap} center={defaultPosition} zoom={12} style={{ height: '100%', width: '100%', borderRadius: '0.5rem' }}>
+              <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              />
+              {geoComplaints.map(complaint => (
+                  <Marker 
+                  key={complaint.id} 
+                  position={[complaint.latitude, complaint.longitude]}
+                  icon={createCustomIcon(getStatusColor(complaint.status))}
+                  >
+                  <Popup>
+                      <div className="w-64">
+                      <h4 className="font-bold text-lg">{complaint.category}</h4>
+                      <p className="text-sm text-muted-foreground mb-2">{complaint.location}</p>
+                      <Badge variant="outline" style={{ borderColor: getStatusColor(complaint.status), color: getStatusColor(complaint.status) }}>{complaint.status}</Badge>
+                      <p className="mt-2 text-sm">{complaint.description}</p>
+                      </div>
+                  </Popup>
+                  </Marker>
+              ))}
+          </MapContainer>
         </CardContent>
       </Card>
     </div>
