@@ -32,7 +32,7 @@ export function MainNav({
       className={cn('hidden md:flex items-center gap-6 text-sm', className)}
       {...props}
     >
-      <Link href="/" className="mr-4">
+      <Link href={user.role === 'admin' ? '/admin' : '/'} className="mr-4">
         <Logo />
       </Link>
       {routes.map((route) => (

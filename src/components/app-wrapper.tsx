@@ -5,8 +5,7 @@ import React, { useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { AppLayout } from '@/components/layouts/app-layout';
 import { AdminLayout } from '@/components/layouts/admin-layout';
-import LoginPage from '@/components/login-page';
-import SignupPage from '@/components/signup-page';
+import LoginPage from '@/app/login/page';
 import { Skeleton } from './ui/skeleton';
 
 export function AppWrapper({ children }: { children: React.ReactNode }) {
@@ -33,43 +32,41 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (pathname === '/login') {
-    return <LoginPage />;
-  }
-
-  if (pathname === '/signup') {
-    return <SignupPage />;
+  if (pathname === '/login' || pathname === '/signup') {
+    return <>{children}</>;
   }
 
   if (!user) {
     return <LoginPage />;
   }
 
-  if (pathname.startsWith('/admin')) {
+  const isAdminPath = pathname.startsWith('/admin');
+  
+  if (isAdminPath) {
     if (user.role === 'admin') {
       return <AdminLayout>{children}</AdminLayout>;
+    } else {
+      // If a citizen tries to access an admin path, show access denied within their layout.
+      return (
+        <AppLayout>
+          <div className="text-center">
+            <h1 className="text-2xl font-bold">Access Denied</h1>
+            <p>You do not have permission to view this page.</p>
+          </div>
+        </AppLayout>
+      );
     }
-    // Simple access denied for now. In a real app, you'd redirect.
-    return (
-      <AppLayout>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold">Access Denied</h1>
-          <p>You do not have permission to view this page.</p>
-        </div>
-      </AppLayout>
-    );
   }
 
-  // Citizen user on a citizen page
+  // For non-admin paths
   if (user.role === 'citizen') {
     return <AppLayout>{children}</AppLayout>;
   }
-  
-  // Admin user on a citizen page
-  if (user.role === 'admin' && !pathname.startsWith('/admin')) {
+
+  if (user.role === 'admin') {
      return <AdminLayout>{children}</AdminLayout>;
   }
 
-
+  // Fallback loading state
   return <div>Loading...</div>;
 }

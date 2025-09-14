@@ -1,15 +1,29 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
 import { Shield, User } from 'lucide-react';
-import { Logo } from './logo';
+import { Logo } from '@/components/logo';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, user } = useAuth();
+  const router = useRouter();
+
+  const handleLogin = (role: 'citizen' | 'admin') => {
+    login(role);
+    router.push(role === 'admin' ? '/admin' : '/');
+  };
+
+  // If user is already logged in, redirect them.
+  if (user) {
+    if (typeof window !== 'undefined') {
+      router.push(user.role === 'admin' ? '/admin' : '/');
+    }
+    return null; // or a loading spinner
+  }
 
   return (
     <div className="relative flex min-h-screen flex-col">
@@ -43,11 +57,11 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Button className="w-full" size="lg" onClick={() => login('citizen')}>
+            <Button className="w-full" size="lg" onClick={() => handleLogin('citizen')}>
               <User className="mr-2" />
               Log in as Citizen
             </Button>
-            <Button className="w-full" size="lg" variant="secondary" onClick={() => login('admin')}>
+            <Button className="w-full" size="lg" variant="secondary" onClick={() => handleLogin('admin')}>
               <Shield className="mr-2" />
               Log in as Admin
             </Button>
