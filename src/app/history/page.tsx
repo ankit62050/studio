@@ -1,12 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -20,6 +19,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 const getStatusColor = (status: ComplaintStatus) => {
   switch (status) {
@@ -91,16 +91,35 @@ function FeedbackForm({ complaintId, onSubmit }: { complaintId: string, onSubmit
   );
 }
 
-
-export default function HistoryPage() {
+function HistoryPageContent() {
   const { user } = useAuth();
   const { complaints } = useComplaints();
+  const searchParams = useSearchParams();
+  const initialStatus = searchParams.get('status') || 'all';
+  
+  type FilterStatus = 'all' | 'pending' | 'resolved';
+  const [filter, setFilter] = useState<FilterStatus>(initialStatus as FilterStatus);
 
   if (!user) return null;
 
-  const userComplaints = complaints
-    .filter((c) => c.userId === user.id)
-    .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
+  const userComplaints = useMemo(() => {
+    return complaints
+      .filter((c) => c.userId === user.id)
+      .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
+  }, [complaints, user.id]);
+
+  const filteredComplaints = useMemo(() => {
+    if (filter === 'all') {
+      return userComplaints;
+    }
+    if (filter === 'pending') {
+      return userComplaints.filter(c => c.status !== 'Resolved');
+    }
+    if (filter === 'resolved') {
+      return userComplaints.filter(c => c.status === 'Resolved');
+    }
+    return userComplaints;
+  }, [userComplaints, filter]);
 
   return (
     <div className="space-y-8">
@@ -111,19 +130,33 @@ export default function HistoryPage() {
         </p>
       </div>
 
-      {userComplaints.length === 0 ? (
-        <p>You have not submitted any complaints yet.</p>
+       <div className="flex space-x-2">
+        <Button variant={filter === 'all' ? 'default' : 'outline'} onClick={() => setFilter('all')}>All Complaints</Button>
+        <Button variant={filter === 'pending' ? 'default' : 'outline'} onClick={() => setFilter('pending')}>Pending</Button>
+        <Button variant={filter === 'resolved' ? 'default' : 'outline'} onClick={() => setFilter('resolved')}>Resolved</Button>
+      </div>
+
+      {filteredComplaints.length === 0 ? (
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-center text-muted-foreground">
+              {filter === 'all' && "You have not submitted any complaints yet."}
+              {filter === 'pending' && "You have no pending complaints."}
+              {filter === 'resolved' && "You have no resolved complaints."}
+            </p>
+          </CardContent>
+        </Card>
       ) : (
         <div className="space-y-4">
-          {userComplaints.map((complaint: Complaint) => (
+          {filteredComplaints.map((complaint: Complaint) => (
             <Card key={complaint.id}>
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle className="text-xl">{complaint.category}</CardTitle>
-                    <CardDescription>{complaint.location}</CardDescription>
+                    <p className="text-sm text-muted-foreground">{complaint.location}</p>
                   </div>
-                  <Badge className={getStatusColor(complaint.status)}>
+                  <Badge className={cn("text-xs font-semibold", getStatusColor(complaint.status))}>
                     {complaint.status}
                   </Badge>
                 </div>
@@ -200,5 +233,13 @@ export default function HistoryPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function HistoryPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HistoryPageContent />
+    </Suspense>
   );
 }

@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { PlusCircle, Hourglass, CheckCircle, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { useComplaints } from '@/hooks/use-complaints';
+import { cn } from '@/lib/utils';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -25,42 +26,48 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Complaints</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{userComplaints.length}</div>
-            <p className="text-xs text-muted-foreground">
-              complaints submitted
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Issues</CardTitle>
-            <Hourglass className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{pendingCount}</div>
-            <p className="text-xs text-muted-foreground">
-              awaiting resolution
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="bg-accent/20 border-accent">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Resolved Issues</CardTitle>
-            <CheckCircle className="h-4 w-4 text-accent" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-accent">{resolvedCount}</div>
-            <p className="text-xs text-muted-foreground">
-              successfully addressed
-            </p>
-          </CardContent>
-        </Card>
+        <Link href="/history?status=all">
+          <Card className="transition-shadow hover:shadow-md h-full">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Complaints</CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{userComplaints.length}</div>
+              <p className="text-xs text-muted-foreground">
+                complaints submitted
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/history?status=pending">
+          <Card className="transition-shadow hover:shadow-md h-full">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Pending Issues</CardTitle>
+              <Hourglass className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{pendingCount}</div>
+              <p className="text-xs text-muted-foreground">
+                awaiting resolution
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/history?status=resolved">
+          <Card className="bg-accent/20 border-accent transition-shadow hover:shadow-md h-full">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Resolved Issues</CardTitle>
+              <CheckCircle className="h-4 w-4 text-accent" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-accent">{resolvedCount}</div>
+              <p className="text-xs text-muted-foreground">
+                successfully addressed
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
       <div className="text-center py-8">
