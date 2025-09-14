@@ -44,7 +44,12 @@ export const complaints: Complaint[] = [
     feedback: {
         rating: 4,
         comment: "The issue was resolved quickly once it was assigned. Good job!"
-    }
+    },
+    upvotes: 15,
+    comments: [
+        { id: 'comment-1-1', userId: 'user-2', text: "This is a real problem in our neighborhood.", createdAt: '2024-07-15T10:00:00Z' },
+        { id: 'comment-1-2', userId: 'user-1', text: "Agreed! Hope it gets fixed soon.", createdAt: '2024-07-15T11:30:00Z' },
+    ]
   },
   {
     id: 'complaint-2',
@@ -59,7 +64,9 @@ export const complaints: Complaint[] = [
     beforeImageUrl: 'https://picsum.photos/seed/complaint2-before/600/400',
     progressImageUrls: [
         { status: 'Work in Progress', imageUrl: 'https://picsum.photos/seed/complaint2-progress/600/400' }
-    ]
+    ],
+    upvotes: 42,
+    comments: []
   },
   {
     id: 'complaint-3',
@@ -72,6 +79,10 @@ export const complaints: Complaint[] = [
     status: 'Under Review',
     submittedAt: '2024-07-22T18:45:00Z',
     beforeImageUrl: 'https://picsum.photos/seed/complaint3-before/600/400',
+    upvotes: 8,
+    comments: [
+        { id: 'comment-3-1', userId: 'user-2', text: "This is unacceptable.", createdAt: '2024-07-22T19:00:00Z' },
+    ]
   },
   {
     id: 'complaint-4',
@@ -84,6 +95,8 @@ export const complaints: Complaint[] = [
     status: 'Received',
     submittedAt: '2024-07-23T08:00:00Z',
     beforeImageUrl: 'https://picsum.photos/seed/complaint4-before/600/400',
+    upvotes: 25,
+    comments: []
   },
   {
     id: 'complaint-5',
@@ -101,6 +114,8 @@ export const complaints: Complaint[] = [
     feedback: {
         rating: 5,
         comment: "Resolved very quickly!"
-    }
+    },
+    upvotes: 5,
+    comments: []
   },
 ];

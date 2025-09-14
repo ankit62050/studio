@@ -31,6 +31,13 @@ export type Feedback = {
   comment: string;
 };
 
+export type Comment = {
+  id: string;
+  userId: string;
+  text: string;
+  createdAt: string;
+}
+
 export type Complaint = {
   id: string;
   userId: string;
@@ -46,6 +53,8 @@ export type Complaint = {
   afterImageUrl?: string;
   progressImageUrls?: { status: ComplaintStatus, imageUrl: string }[];
   feedback?: Feedback;
+  upvotes: number;
+  comments: Comment[];
 };
 
 export const departments = ["Sanitation", "Public Works", "Transportation", "Parks & Rec"] as const;

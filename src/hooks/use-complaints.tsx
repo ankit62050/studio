@@ -1,6 +1,6 @@
 'use client';
 
-import type { Complaint, ComplaintStatus, Feedback } from '@/lib/types';
+import type { Complaint, ComplaintStatus, Feedback, Comment } from '@/lib/types';
 import { complaints as initialComplaints } from '@/lib/data';
 import React, { createContext, useContext, useState, ReactNode, useMemo, useCallback, useEffect } from 'react';
 
@@ -11,6 +11,8 @@ interface ComplaintsContextType {
   updateComplaint: (complaintId: string, data: Partial<Complaint>) => void;
   addComplaintImage: (complaintId: string, imageUrl: string, status: ComplaintStatus) => void;
   addFeedback: (complaintId: string, feedback: Feedback) => void;
+  toggleUpvote: (complaintId: string) => void;
+  addComment: (complaintId: string, comment: Comment) => void;
 }
 
 const ComplaintsContext = createContext<ComplaintsContextType | undefined>(undefined);
@@ -42,7 +44,7 @@ export function ComplaintsProvider({ children }: { children: ReactNode }) {
   }, [complaints, isLoaded]);
 
   const addComplaint = useCallback((complaint: Complaint) => {
-    setComplaints(prev => [complaint, ...prev]);
+    setComplaints(prev => [{ ...complaint, upvotes: 0, comments: [] }, ...prev]);
   }, []);
 
   const updateComplaintStatus = useCallback((complaintId: string, status: ComplaintStatus) => {
@@ -94,8 +96,25 @@ export function ComplaintsProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  const toggleUpvote = useCallback((complaintId: string) => {
+    // In a real app, you'd also track which user has upvoted.
+    // For this simulation, we'll just increment/decrement.
+    setComplaints(prev =>
+      prev.map(c =>
+        c.id === complaintId ? { ...c, upvotes: c.upvotes + 1 } : c // Simplified for now
+      )
+    );
+  }, []);
 
-  const value = useMemo(() => ({ complaints, addComplaint, updateComplaintStatus, updateComplaint, addComplaintImage, addFeedback }), [complaints, addComplaint, updateComplaintStatus, updateComplaint, addComplaintImage, addFeedback]);
+  const addComment = useCallback((complaintId: string, comment: Comment) => {
+    setComplaints(prev =>
+      prev.map(c =>
+        c.id === complaintId ? { ...c, comments: [...c.comments, comment] } : c
+      )
+    );
+  }, []);
+
+  const value = useMemo(() => ({ complaints, addComplaint, updateComplaintStatus, updateComplaint, addComplaintImage, addFeedback, toggleUpvote, addComment }), [complaints, addComplaint, updateComplaintStatus, updateComplaint, addComplaintImage, addFeedback, toggleUpvote, addComment]);
 
   return (
     <ComplaintsContext.Provider value={value}>
