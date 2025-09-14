@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
@@ -37,6 +37,9 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
+
+type StatusFilter = ComplaintStatus | 'Pending' | 'All';
 
 export default function AdminDashboardPage() {
   const { complaints, updateComplaintStatus, addComplaintImage, updateComplaint } = useComplaints();
@@ -48,6 +51,7 @@ export default function AdminDashboardPage() {
   const [suggestion, setSuggestion] = useState<ProcessComplaintOutput | null>(null);
   const [isSuggestionDialogOpen, setIsSuggestionDialogOpen] = useState(false);
   const [currentComplaintIdForDialog, setCurrentComplaintIdForDialog] = useState<string | null>(null);
+  const [activeFilter, setActiveFilter] = useState<StatusFilter>('All');
 
   const handleStatusChange = (complaintId: string, newStatus: ComplaintStatus) => {
     updateComplaintStatus(complaintId, newStatus);
@@ -120,10 +124,20 @@ export default function AdminDashboardPage() {
   };
 
 
-  const statusCounts = complaintStatuses.reduce((acc, status) => {
+  const statusCounts = useMemo(() => complaintStatuses.reduce((acc, status) => {
     acc[status] = complaints.filter(c => c.status === status).length;
     return acc;
-  }, {} as Record<ComplaintStatus, number>);
+  }, {} as Record<ComplaintStatus, number>), [complaints]);
+
+  const pendingCount = statusCounts['Received'] + statusCounts['Under Review'];
+
+  const filteredComplaints = useMemo(() => {
+    if (activeFilter === 'All') return complaints;
+    if (activeFilter === 'Pending') {
+      return complaints.filter(c => c.status === 'Received' || c.status === 'Under Review');
+    }
+    return complaints.filter(c => c.status === activeFilter);
+  }, [complaints, activeFilter]);
 
   const currentComplaintForDialog = complaints.find(c => c.id === currentComplaintIdForDialog);
 
@@ -136,7 +150,7 @@ export default function AdminDashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card onClick={() => setActiveFilter('All')} className={cn("cursor-pointer transition-shadow hover:shadow-md", activeFilter === 'All' && "ring-2 ring-primary")}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Complaints</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
@@ -145,16 +159,16 @@ export default function AdminDashboardPage() {
             <div className="text-2xl font-bold">{complaints.length}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card onClick={() => setActiveFilter('Pending')} className={cn("cursor-pointer transition-shadow hover:shadow-md", activeFilter === 'Pending' && "ring-2 ring-primary")}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Under Review</CardTitle>
+            <CardTitle className="text-sm font-medium">Pending</CardTitle>
             <Hourglass className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{statusCounts['Under Review'] + statusCounts['Received']}</div>
+            <div className="text-2xl font-bold">{pendingCount}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card onClick={() => setActiveFilter('Work in Progress')} className={cn("cursor-pointer transition-shadow hover:shadow-md", activeFilter === 'Work in Progress' && "ring-2 ring-primary")}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Work in Progress</CardTitle>
             <BarChart className="h-4 w-4 text-muted-foreground" />
@@ -163,7 +177,7 @@ export default function AdminDashboardPage() {
             <div className="text-2xl font-bold">{statusCounts['Work in Progress']}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card onClick={() => setActiveFilter('Resolved')} className={cn("cursor-pointer transition-shadow hover:shadow-md", activeFilter === 'Resolved' && "ring-2 ring-primary")}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Resolved</CardTitle>
             <CheckCircle className="h-4 w-4 text-green-600" />
@@ -202,7 +216,7 @@ export default function AdminDashboardPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {complaints.map((complaint) => {
+                {filteredComplaints.map((complaint) => {
                   const user = getUserById(complaint.userId);
                   const isProcessing = processingComplaintId === complaint.id;
                   return (
