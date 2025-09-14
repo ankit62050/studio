@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
@@ -14,15 +15,17 @@ export default function LoginPage() {
 
   const handleLogin = (role: 'citizen' | 'admin') => {
     login(role);
-    router.push(role === 'admin' ? '/admin' : '/');
   };
 
-  // If user is already logged in, redirect them.
-  if (user) {
-    if (typeof window !== 'undefined') {
+  useEffect(() => {
+    if (user) {
       router.push(user.role === 'admin' ? '/admin' : '/');
     }
-    return null; // or a loading spinner
+  }, [user, router]);
+  
+  // If user is logged in, we show nothing and let the effect redirect.
+  if (user) {
+    return null; 
   }
 
   return (
