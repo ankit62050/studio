@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
-import { PlusCircle, FileText, Users, Map } from 'lucide-react';
+import { PlusCircle, FileText, Users, Map as MapIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo } from 'react';
 import { useComplaints } from '@/hooks/use-complaints';
@@ -65,7 +65,7 @@ export default function DashboardPage() {
     },
     {
       href: '/map',
-      icon: <Map className="w-7 h-7" />,
+      icon: <MapIcon className="w-7 h-7" />,
       title: 'Nearby Issues',
       description: 'View a map of all reported complaints in the area.',
     },
