@@ -21,7 +21,7 @@ export default function CommunityPage() {
   const sortedComplaints = useMemo(() => {
     const sorted = [...complaints];
     if (sortOption === 'upvotes') {
-      sorted.sort((a, b) => b.upvotes - a.upvotes);
+      sorted.sort((a, b) => (b.upvotedBy?.length || 0) - (a.upvotedBy?.length || 0));
     } else if (sortOption === 'recent') {
       sorted.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
     }

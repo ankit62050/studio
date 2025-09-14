@@ -53,7 +53,7 @@ export type Complaint = {
   afterImageUrl?: string;
   progressImageUrls?: { status: ComplaintStatus, imageUrl: string }[];
   feedback?: Feedback;
-  upvotes: number;
+  upvotedBy: string[]; // Changed from upvotes: number
   comments: Comment[];
 };
 

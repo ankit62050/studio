@@ -3,6 +3,7 @@
 import type { Complaint, ComplaintStatus, Feedback, Comment } from '@/lib/types';
 import { complaints as initialComplaints } from '@/lib/data';
 import React, { createContext, useContext, useState, ReactNode, useMemo, useCallback, useEffect } from 'react';
+import { useAuth } from './use-auth';
 
 interface ComplaintsContextType {
   complaints: Complaint[];
@@ -20,6 +21,7 @@ const ComplaintsContext = createContext<ComplaintsContextType | undefined>(undef
 export function ComplaintsProvider({ children }: { children: ReactNode }) {
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     try {
@@ -28,12 +30,16 @@ export function ComplaintsProvider({ children }: { children: ReactNode }) {
       if (storedComplaints) {
         complaintsData = JSON.parse(storedComplaints);
       } else {
-        complaintsData = initialComplaints;
+        // Add upvotedBy to initial data if it's missing
+        complaintsData = initialComplaints.map(c => ({
+            ...c,
+            upvotedBy: c.upvotedBy || [],
+        }));
       }
       // Data hydration: Ensure all complaints have upvotes and comments
       const hydratedComplaints = complaintsData.map(c => ({
         ...c,
-        upvotes: c.upvotes || 0,
+        upvotedBy: c.upvotedBy || [],
         comments: c.comments || [],
       }));
       setComplaints(hydratedComplaints);
@@ -52,7 +58,7 @@ export function ComplaintsProvider({ children }: { children: ReactNode }) {
   }, [complaints, isLoaded]);
 
   const addComplaint = useCallback((complaint: Complaint) => {
-    setComplaints(prev => [{ ...complaint, upvotes: 0, comments: [] }, ...prev]);
+    setComplaints(prev => [{ ...complaint, upvotedBy: [], comments: [] }, ...prev]);
   }, []);
 
   const updateComplaintStatus = useCallback((complaintId: string, status: ComplaintStatus) => {
@@ -105,14 +111,26 @@ export function ComplaintsProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const toggleUpvote = useCallback((complaintId: string) => {
-    // In a real app, you'd also track which user has upvoted.
-    // For this simulation, we'll just increment/decrement.
+    if (!user) return; // User must be logged in to vote
+
     setComplaints(prev =>
-      prev.map(c =>
-        c.id === complaintId ? { ...c, upvotes: (c.upvotes || 0) + 1 } : c
-      )
+      prev.map(c => {
+        if (c.id === complaintId) {
+          const upvotedBy = c.upvotedBy || [];
+          const userHasUpvoted = upvotedBy.includes(user.id);
+          
+          if (userHasUpvoted) {
+            // User has upvoted, so remove their vote
+            return { ...c, upvotedBy: upvotedBy.filter(id => id !== user.id) };
+          } else {
+            // User has not upvoted, so add their vote
+            return { ...c, upvotedBy: [...upvotedBy, user.id] };
+          }
+        }
+        return c;
+      })
     );
-  }, []);
+  }, [user]);
 
   const addComment = useCallback((complaintId: string, comment: Comment) => {
     setComplaints(prev =>

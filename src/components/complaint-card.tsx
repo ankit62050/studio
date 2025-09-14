@@ -12,10 +12,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { ArrowUp, MessageSquare, Bell, MapPin, Trash2, Droplet, TrafficCone, SprayCan } from 'lucide-react';
+import { ArrowUp, MessageSquare, MapPin, Trash2, Droplet, TrafficCone, SprayCan } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Textarea } from '@/components/ui/textarea';
-import { Separator } from './ui/separator';
 
 const categoryIcons: { [key: string]: React.ReactNode } = {
   "Garbage": <Trash2 className="h-4 w-4" />,
@@ -47,7 +46,6 @@ export function ComplaintCard({ complaint }: { complaint: Complaint }) {
   const [newComment, setNewComment] = useState('');
 
   const complaintUser = getUserById(complaint.userId);
-  const [isFollowing, setIsFollowing] = useState(false); // Simulating follow state
 
   const handleAddComment = () => {
     if (!user || !newComment.trim()) return;
@@ -64,6 +62,8 @@ export function ComplaintCard({ complaint }: { complaint: Complaint }) {
   const images = [complaint.beforeImageUrl, ...complaint.progressImageUrls?.map(p => p.imageUrl) ?? [], complaint.afterImageUrl].filter(Boolean) as string[];
 
   const comments = complaint.comments || [];
+  const upvotedBy = complaint.upvotedBy || [];
+  const hasUpvoted = user ? upvotedBy.includes(user.id) : false;
 
   return (
     <Card className="flex flex-col h-full">
@@ -109,16 +109,13 @@ export function ComplaintCard({ complaint }: { complaint: Complaint }) {
       <CardFooter className="flex-col items-start gap-4">
         <div className="flex justify-between w-full">
             <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => toggleUpvote(complaint.id)}>
-                    <ArrowUp className="mr-2 h-4 w-4" /> {complaint.upvotes || 0}
+                <Button variant={hasUpvoted ? 'default' : 'outline'} size="sm" onClick={() => toggleUpvote(complaint.id)} disabled={!user}>
+                    <ArrowUp className={cn("mr-2 h-4 w-4", hasUpvoted && "fill-current")} /> {upvotedBy.length}
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => setShowComments(!showComments)}>
                     <MessageSquare className="mr-2 h-4 w-4" /> {comments.length}
                 </Button>
             </div>
-            <Button variant={isFollowing ? 'default' : 'outline'} size="sm" onClick={() => setIsFollowing(!isFollowing)}>
-                <Bell className="mr-2 h-4 w-4" /> {isFollowing ? 'Following' : 'Follow'}
-            </Button>
         </div>
 
         {showComments && (
