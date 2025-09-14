@@ -16,8 +16,6 @@ export function MainNav({
   const citizenRoutes = [
     { href: '/', label: 'Dashboard' },
     { href: '/community', label: 'Community' },
-    { href: '/map', label: 'Map' },
-    { href: '/submit', label: 'New Complaint' },
     { href: '/history', label: 'My History' },
     { href: '/faq', label: 'FAQ' },
     { href: '/contact', label: 'Contact Us' },
