@@ -8,6 +8,7 @@ interface ComplaintsContextType {
   complaints: Complaint[];
   addComplaint: (complaint: Complaint) => void;
   updateComplaintStatus: (complaintId: string, status: ComplaintStatus) => void;
+  updateComplaint: (complaintId: string, data: Partial<Complaint>) => void;
   addComplaintImage: (complaintId: string, imageUrl: string, status: ComplaintStatus) => void;
   addFeedback: (complaintId: string, feedback: Feedback) => void;
 }
@@ -33,6 +34,14 @@ export function ComplaintsProvider({ children }: { children: ReactNode }) {
         }
         return c;
       })
+    );
+  }, []);
+
+  const updateComplaint = useCallback((complaintId: string, data: Partial<Complaint>) => {
+    setComplaints(prev =>
+      prev.map(c =>
+        c.id === complaintId ? { ...c, ...data } : c
+      )
     );
   }, []);
 
@@ -63,7 +72,7 @@ export function ComplaintsProvider({ children }: { children: ReactNode }) {
   }, []);
 
 
-  const value = useMemo(() => ({ complaints, addComplaint, updateComplaintStatus, addComplaintImage, addFeedback }), [complaints, addComplaint, updateComplaintStatus, addComplaintImage, addFeedback]);
+  const value = useMemo(() => ({ complaints, addComplaint, updateComplaintStatus, updateComplaint, addComplaintImage, addFeedback }), [complaints, addComplaint, updateComplaintStatus, updateComplaint, addComplaintImage, addFeedback]);
 
   return (
     <ComplaintsContext.Provider value={value}>
@@ -79,3 +88,5 @@ export function useComplaints() {
   }
   return context;
 }
+
+    

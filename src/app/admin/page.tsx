@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
@@ -18,20 +18,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Complaint, ComplaintStatus, complaintStatuses, User } from '@/lib/types';
-import { users } from '@/lib/data';
+import { Complaint, ComplaintStatus, complaintStatuses, User, Officer } from '@/lib/types';
+import { users, officers } from '@/lib/data';
 import { format } from 'date-fns';
-import { BarChart, FileText, Hourglass, CheckCircle, Camera, Star } from 'lucide-react';
+import { BarChart, FileText, Hourglass, CheckCircle, Camera, Star, Sparkles, Loader2, User as UserIcon, Building, Shield, Layers } from 'lucide-react';
 import Image from 'next/image';
 import { useComplaints } from '@/hooks/use-complaints';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { processComplaint, ProcessComplaintOutput } from '@/ai/flows/process-complaint';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
 
 export default function AdminDashboardPage() {
-  const { complaints, updateComplaintStatus, addComplaintImage } = useComplaints();
+  const { complaints, updateComplaintStatus, addComplaintImage, updateComplaint } = useComplaints();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const currentComplaintAction = useRef<{ complaintId: string; status: ComplaintStatus } | null>(null);
+  const { toast } = useToast();
+
+  const [processingComplaintId, setProcessingComplaintId] = useState<string | null>(null);
+  const [suggestion, setSuggestion] = useState<ProcessComplaintOutput | null>(null);
+  const [isSuggestionDialogOpen, setIsSuggestionDialogOpen] = useState(false);
 
   const handleStatusChange = (complaintId: string, newStatus: ComplaintStatus) => {
     updateComplaintStatus(complaintId, newStatus);
@@ -56,17 +71,59 @@ export default function AdminDashboardPage() {
       };
       reader.readAsDataURL(file);
     }
-    // Reset file input
     if(fileInputRef.current) {
         fileInputRef.current.value = '';
     }
     currentComplaintAction.current = null;
   };
 
+  const handleProcessComplaint = async (complaint: Complaint) => {
+    setProcessingComplaintId(complaint.id);
+    try {
+      const result = await processComplaint({
+        complaint: {
+          description: complaint.description,
+          location: complaint.location,
+          photoDataUri: complaint.beforeImageUrl,
+        },
+        officers,
+      });
+      setSuggestion(result);
+      setIsSuggestionDialogOpen(true);
+    } catch (error) {
+      console.error("AI processing failed", error);
+      toast({
+        variant: 'destructive',
+        title: 'AI Processing Failed',
+        description: 'There was an error while processing the complaint with AI.',
+      });
+    } finally {
+      setProcessingComplaintId(null);
+    }
+  };
+
+  const handleAcceptSuggestion = (complaintId: string) => {
+    if (!suggestion) return;
+    updateComplaint(complaintId, {
+        category: suggestion.suggestedCategory,
+        status: 'Under Review'
+    });
+    toast({
+        title: 'Complaint Updated',
+        description: 'The complaint has been updated based on AI suggestions.',
+    });
+    setIsSuggestionDialogOpen(false);
+    setSuggestion(null);
+  };
+
+
   const statusCounts = complaintStatuses.reduce((acc, status) => {
     acc[status] = complaints.filter(c => c.status === status).length;
     return acc;
   }, {} as Record<ComplaintStatus, number>);
+
+  const currentComplaintForDialog = complaints.find(c => c.id === processingComplaintId || (suggestion && c.id === complaints.find(comp => comp.description === suggestion.reasoning.split('`')[1])?.id));
+
 
   return (
     <div className="space-y-8">
@@ -132,6 +189,7 @@ export default function AdminDashboardPage() {
                 <TableRow>
                   <TableHead>User</TableHead>
                   <TableHead>Category</TableHead>
+                  <TableHead>Description</TableHead>
                   <TableHead>Location</TableHead>
                   <TableHead>Submitted</TableHead>
                   <TableHead>Status</TableHead>
@@ -143,6 +201,7 @@ export default function AdminDashboardPage() {
               <TableBody>
                 {complaints.map((complaint) => {
                   const user = getUserById(complaint.userId);
+                  const isProcessing = processingComplaintId === complaint.id;
                   return (
                     <TableRow key={complaint.id}>
                       <TableCell>
@@ -152,6 +211,7 @@ export default function AdminDashboardPage() {
                       <TableCell>
                         <Badge variant="secondary">{complaint.category}</Badge>
                       </TableCell>
+                       <TableCell className="max-w-xs truncate">{complaint.description}</TableCell>
                       <TableCell>{complaint.location}</TableCell>
                       <TableCell>
                         {format(new Date(complaint.submittedAt), 'PPp')}
@@ -222,12 +282,18 @@ export default function AdminDashboardPage() {
                         </div>
                       </TableCell>
                       <TableCell className="space-y-2">
+                          {complaint.status === 'Received' && (
+                            <Button variant="outline" size="sm" onClick={() => handleProcessComplaint(complaint)} disabled={isProcessing}>
+                              {isProcessing ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Sparkles className="mr-2 h-4 w-4"/>}
+                              AI Process
+                            </Button>
+                          )}
                           {complaint.status === 'Work in Progress' && (
                               <Button variant="outline" size="sm" onClick={() => handleAddPhotoClick(complaint.id, 'Work in Progress')}>
                                   <Camera className="mr-2 h-4 w-4"/> Add Progress Photo
                               </Button>
                           )}
-                          {complaint.status === 'Resolved' && (
+                          {complaint.status === 'Resolved' && !complaint.afterImageUrl && (
                               <Button variant="outline" size="sm" onClick={() => handleAddPhotoClick(complaint.id, 'Resolved')}>
                                   <Camera className="mr-2 h-4 w-4"/> Add After Photo
                               </Button>
@@ -241,6 +307,48 @@ export default function AdminDashboardPage() {
           </div>
         </CardContent>
       </Card>
+      
+      {currentComplaintForDialog && suggestion && (
+        <Dialog open={isSuggestionDialogOpen} onOpenChange={setIsSuggestionDialogOpen}>
+            <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                <DialogTitle>AI Complaint Processing Suggestions</DialogTitle>
+                <DialogDescription>
+                    The AI has analyzed the complaint and provided the following recommendations. Review and accept to update the complaint.
+                </DialogDescription>
+                </DialogHeader>
+                <div className="grid grid-cols-2 gap-x-8 gap-y-4 py-4">
+                    <div className="space-y-4">
+                        <h4 className="font-semibold text-lg">Complaint</h4>
+                        <p className="text-sm text-muted-foreground p-4 bg-muted/50 rounded-lg">{currentComplaintForDialog.description}</p>
+                         {currentComplaintForDialog.beforeImageUrl && (
+                           <Image src={currentComplaintForDialog.beforeImageUrl} alt="Complaint" width={300} height={225} className="rounded-lg object-cover" />
+                        )}
+                    </div>
+                    <div className="space-y-4">
+                        <h4 className="font-semibold text-lg">AI Suggestions</h4>
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-2"><Layers className="text-primary"/> <strong>Category:</strong> <Badge variant="outline">{suggestion.suggestedCategory}</Badge></div>
+                            <div className="flex items-center gap-2"><Building className="text-primary"/> <strong>Department:</strong> {suggestion.recommendedDepartment}</div>
+                            <div className="flex items-center gap-2"><Shield className="text-primary"/> <strong>Priority:</strong> {suggestion.priority}</div>
+                            <div className="flex items-center gap-2"><UserIcon className="text-primary"/> <strong>Officer:</strong> {suggestion.assignedOfficer.name}</div>
+                        </div>
+                        <div>
+                            <h5 className="font-semibold mb-2 mt-4">Reasoning</h5>
+                            <p className="text-sm text-muted-foreground p-4 bg-muted/50 rounded-lg">{suggestion.reasoning}</p>
+                        </div>
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button variant="ghost" onClick={() => setIsSuggestionDialogOpen(false)}>Cancel</Button>
+                    <Button onClick={() => handleAcceptSuggestion(currentComplaintForDialog.id)}>Accept & Update</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+      )}
+
     </div>
   );
 }
+
+    
