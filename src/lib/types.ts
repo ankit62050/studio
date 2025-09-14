@@ -31,7 +31,6 @@ export type Feedback = {
   comment: string;
 };
 
-
 export type Complaint = {
   id: string;
   userId: string;
@@ -45,4 +44,15 @@ export type Complaint = {
   afterImageUrl?: string;
   progressImageUrls?: { status: ComplaintStatus, imageUrl: string }[];
   feedback?: Feedback;
+};
+
+export const departments = ["Sanitation", "Public Works", "Transportation", "Parks & Rec"] as const;
+export type Department = (typeof departments)[number];
+
+export type Officer = {
+  id: string;
+  name: string;
+  department: Department;
+  location: string; // Could be a GeoPoint in a real app
+  activeCases: number;
 };

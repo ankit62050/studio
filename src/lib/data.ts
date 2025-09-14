@@ -1,4 +1,4 @@
-import type { User, Complaint } from './types';
+import type { User, Complaint, Officer } from './types';
 
 export const users: User[] = [
   {
@@ -16,6 +16,16 @@ export const users: User[] = [
     avatarUrl: 'https://picsum.photos/seed/avatar2/100/100',
   },
 ];
+
+export const officers: Officer[] = [
+  { id: 'officer-1', name: 'Amit Singh', department: 'Sanitation', location: 'District 1', activeCases: 3 },
+  { id: 'officer-2', name: 'Priya Sharma', department: 'Sanitation', location: 'District 2', activeCases: 5 },
+  { id: 'officer-3', name: 'Rajesh Kumar', department: 'Public Works', location: 'District 1', activeCases: 2 },
+  { id: 'officer-4', name: 'Sunita Gupta', department: 'Public Works', location: 'District 3', activeCases: 4 },
+  { id: 'officer-5', name: 'Vijay Reddy', department: 'Transportation', location: 'City Wide', activeCases: 6 },
+  { id: 'officer-6', name: 'Meera Desai', department: 'Parks & Rec', location: 'District 2', activeCases: 1 },
+];
+
 
 export const complaints: Complaint[] = [
   {
