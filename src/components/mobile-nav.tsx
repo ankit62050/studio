@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Home, PlusCircle, History, User, Shield, TrendingUp, Users } from 'lucide-react';
+import { Home, PlusCircle, History, User, Shield, Users } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 
 export function MobileNav() {
@@ -13,7 +13,6 @@ export function MobileNav() {
   const citizenRoutes = [
     { href: '/', label: 'Home', icon: Home },
     { href: '/community', label: 'Community', icon: Users },
-    { href: '/trends', label: 'Trends', icon: TrendingUp },
     { href: '/submit', label: 'Submit', icon: PlusCircle },
     { href: '/history', label: 'History', icon: History },
     { href: '/profile', label: 'Profile', icon: User },
@@ -23,7 +22,6 @@ export function MobileNav() {
     { href: '/admin', label: 'Dashboard', icon: Shield },
     { href: '/admin/map', label: 'Map', icon: Home },
     { href: '/community', label: 'Community', icon: Users },
-    { href: '/trends', label: 'Trends', icon: TrendingUp },
     { href: '/profile', label: 'Profile', icon: User },
   ];
 
