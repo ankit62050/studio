@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { ArrowUp, MessageSquare, MapPin, Trash2, Droplet, TrafficCone, SprayCan, X } from 'lucide-react';
+import { ArrowUp, MessageSquare, MapPin, Trash2, Droplet, TrafficCone, SprayCan, X, User as UserIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -70,11 +70,10 @@ export function ComplaintCard({ complaint }: { complaint: Complaint }) {
       <CardHeader>
         <div className="flex items-start gap-4">
           <Avatar>
-            <AvatarImage src={complaintUser?.avatarUrl} alt={complaintUser?.name} />
-            <AvatarFallback>{complaintUser?.name.charAt(0)}</AvatarFallback>
+            <AvatarFallback><UserIcon className="h-5 w-5"/></AvatarFallback>
           </Avatar>
           <div>
-            <div className="font-semibold">{complaintUser?.name || 'Anonymous'}</div>
+            <div className="font-semibold">Anonymous</div>
             <div className="text-xs text-muted-foreground">
               {formatDistanceToNow(new Date(complaint.submittedAt), { addSuffix: true })}
             </div>
@@ -130,12 +129,11 @@ export function ComplaintCard({ complaint }: { complaint: Complaint }) {
                         return (
                             <div key={comment.id} className="flex items-start gap-3 group">
                                 <Avatar className="h-8 w-8">
-                                    <AvatarImage src={commentUser?.avatarUrl} alt={commentUser?.name} />
-                                    <AvatarFallback>{commentUser?.name.charAt(0)}</AvatarFallback>
+                                    <AvatarFallback><UserIcon className="h-4 w-4"/></AvatarFallback>
                                 </Avatar>
                                 <div className="flex-grow">
                                     <div className="flex items-center gap-2">
-                                        <span className="font-semibold text-sm">{commentUser?.name}</span>
+                                        <span className="font-semibold text-sm">Anonymous</span>
                                         <span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}</span>
                                     </div>
                                     <p className="text-sm">{comment.text}</p>
