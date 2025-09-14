@@ -36,7 +36,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           <SidebarMenu>
             {routes.map((route) => (
               <SidebarMenuItem key={route.href}>
-                <Link href={route.href} legacyBehavior passHref>
+                <Link href={route.href}>
                   <SidebarMenuButton
                     isActive={pathname === route.href}
                     tooltip={route.label}
