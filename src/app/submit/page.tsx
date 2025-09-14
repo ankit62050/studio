@@ -32,10 +32,12 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { complaintCategories, ComplaintCategory } from '@/lib/types';
+import { complaintCategories, ComplaintCategory, Complaint } from '@/lib/types';
 import { Camera, Loader2, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import { categorizeComplaintImage } from '@/ai/flows/categorize-complaint-image';
+import { useAuth } from '@/hooks/use-auth';
+import { useComplaints } from '@/hooks/use-complaints';
 
 const formSchema = z.object({
   category: z.enum(complaintCategories, {
@@ -51,6 +53,8 @@ type FormValues = z.infer<typeof formSchema>;
 export default function SubmitComplaintPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { addComplaint } = useComplaints();
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCategorizing, setIsCategorizing] = useState(false);
@@ -100,18 +104,35 @@ export default function SubmitComplaintPage() {
   };
 
   const onSubmit = (data: FormValues) => {
+    if (!user) {
+        toast({
+            variant: 'destructive',
+            title: 'Not Logged In',
+            description: 'You must be logged in to submit a complaint.',
+        });
+        return;
+    }
     setIsSubmitting(true);
-    console.log('Form submitted:', data);
+    
+    const newComplaint: Complaint = {
+        id: `complaint-${Date.now()}`,
+        userId: user.id,
+        category: data.category,
+        description: data.description,
+        location: data.location,
+        status: 'Received',
+        submittedAt: new Date().toISOString(),
+        beforeImageUrl: data.photo,
+    };
 
-    // Simulate API call
-    setTimeout(() => {
-      toast({
-        title: 'Complaint Submitted!',
-        description: 'Thank you for your submission. You will be redirected to your history.',
-      });
-      setIsSubmitting(false);
-      router.push('/history');
-    }, 1500);
+    addComplaint(newComplaint);
+
+    toast({
+      title: 'Complaint Submitted!',
+      description: 'Thank you for your submission. You will be redirected to your history.',
+    });
+    
+    router.push('/history');
   };
 
   return (

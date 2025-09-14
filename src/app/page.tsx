@@ -5,10 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
 import { PlusCircle, Hourglass, CheckCircle, FileText } from 'lucide-react';
 import Link from 'next/link';
-import { complaints } from '@/lib/data';
+import { useComplaints } from '@/hooks/use-complaints';
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { complaints } = useComplaints();
   
   if (!user) return null; // Should be handled by AppWrapper, but as a fallback.
 

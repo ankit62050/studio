@@ -19,20 +19,17 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Complaint, ComplaintStatus, complaintStatuses, User } from '@/lib/types';
-import { complaints as allComplaints, users } from '@/lib/data';
+import { users } from '@/lib/data';
 import { format } from 'date-fns';
 import { BarChart, FileText, Hourglass, CheckCircle } from 'lucide-react';
 import Image from 'next/image';
+import { useComplaints } from '@/hooks/use-complaints';
 
 export default function AdminDashboardPage() {
-  const [complaints, setComplaints] = useState<Complaint[]>(allComplaints);
+  const { complaints, updateComplaintStatus } = useComplaints();
 
   const handleStatusChange = (complaintId: string, newStatus: ComplaintStatus) => {
-    setComplaints((prevComplaints) =>
-      prevComplaints.map((c) =>
-        c.id === complaintId ? { ...c, status: newStatus } : c
-      )
-    );
+    updateComplaintStatus(complaintId, newStatus);
   };
   
   const getUserById = (userId: string): User | undefined => {

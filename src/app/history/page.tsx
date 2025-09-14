@@ -9,10 +9,10 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
-import { complaints as allComplaints } from '@/lib/data';
 import { Complaint, ComplaintStatus } from '@/lib/types';
 import { format } from 'date-fns';
 import Image from 'next/image';
+import { useComplaints } from '@/hooks/use-complaints';
 
 const getStatusColor = (status: ComplaintStatus) => {
   switch (status) {
@@ -31,10 +31,11 @@ const getStatusColor = (status: ComplaintStatus) => {
 
 export default function HistoryPage() {
   const { user } = useAuth();
+  const { complaints } = useComplaints();
 
   if (!user) return null;
 
-  const userComplaints = allComplaints
+  const userComplaints = complaints
     .filter((c) => c.userId === user.id)
     .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
 

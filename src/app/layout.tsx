@@ -3,6 +3,7 @@ import './globals.css';
 import { AuthProvider } from '@/hooks/use-auth';
 import { Toaster } from '@/components/ui/toaster';
 import { AppWrapper } from '@/components/app-wrapper';
+import { ComplaintsProvider } from '@/hooks/use-complaints';
 
 export const metadata: Metadata = {
   title: 'JANConnect Lite',
@@ -26,7 +27,9 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <AuthProvider>
-          <AppWrapper>{children}</AppWrapper>
+          <ComplaintsProvider>
+            <AppWrapper>{children}</AppWrapper>
+          </ComplaintsProvider>
           <Toaster />
         </AuthProvider>
       </body>
