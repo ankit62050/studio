@@ -17,6 +17,7 @@ import { UserNav } from '@/components/user-nav';
 import { Shield, BarChart2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
+import { Chatbot } from '../chatbot';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -65,6 +66,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             </div>
             {children}
         </div>
+        <Chatbot />
       </SidebarInset>
     </SidebarProvider>
   );

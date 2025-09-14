@@ -1,3 +1,4 @@
+import { Chatbot } from "../chatbot";
 import { Header } from "@/components/header";
 import { MobileNav } from "@/components/mobile-nav";
 
@@ -11,6 +12,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       <Header />
       <main className="flex-1 container py-8 pb-24">{children}</main>
       <MobileNav />
+      <Chatbot />
     </div>
   );
 }
