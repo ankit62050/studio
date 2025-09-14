@@ -23,6 +23,12 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
     }
   }, [isMounted, user, pathname, router]);
 
+  useEffect(() => {
+    if (isMounted && user?.role === 'admin' && !pathname.startsWith('/admin')) {
+      router.push('/admin');
+    }
+  }, [isMounted, user, pathname, router]);
+
   if (!isMounted || (!user && pathname !== '/login')) {
     return (
       <div className="w-full h-screen p-8">
@@ -69,14 +75,22 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
   if (user.role === 'citizen') {
     return <AppLayout>{children}</AppLayout>;
   }
-
+  
+  // If an admin is on a non-admin page, the useEffect above will redirect them.
+  // We return a loading state to prevent rendering the citizen UI briefly.
   if (user.role === 'admin') {
-     // Admin visiting a citizen page, we can redirect or show the app layout.
-     // Redirecting to admin dashboard is a sensible default.
-      if (typeof window !== 'undefined') {
-        router.push('/admin');
-      }
-      return null;
+    return (
+       <div className="w-full h-screen p-8">
+        <div className="flex items-center space-x-4 mb-8">
+          <Skeleton className="h-12 w-12 rounded-full" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-[250px]" />
+            <Skeleton className="h-4 w-[200px]" />
+          </div>
+        </div>
+        <Skeleton className="h-[400px] w-full" />
+      </div>
+    );
   }
 
   // Fallback, should not be reached.
