@@ -24,11 +24,19 @@ export function ComplaintsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const storedComplaints = localStorage.getItem('complaints');
+      let complaintsData: Complaint[] = [];
       if (storedComplaints) {
-        setComplaints(JSON.parse(storedComplaints));
+        complaintsData = JSON.parse(storedComplaints);
       } else {
-        setComplaints(initialComplaints);
+        complaintsData = initialComplaints;
       }
+      // Data hydration: Ensure all complaints have upvotes and comments
+      const hydratedComplaints = complaintsData.map(c => ({
+        ...c,
+        upvotes: c.upvotes || 0,
+        comments: c.comments || [],
+      }));
+      setComplaints(hydratedComplaints);
     } catch (error) {
       console.error("Could not parse complaints from localStorage", error);
       setComplaints(initialComplaints);
@@ -101,7 +109,7 @@ export function ComplaintsProvider({ children }: { children: ReactNode }) {
     // For this simulation, we'll just increment/decrement.
     setComplaints(prev =>
       prev.map(c =>
-        c.id === complaintId ? { ...c, upvotes: c.upvotes + 1 } : c // Simplified for now
+        c.id === complaintId ? { ...c, upvotes: (c.upvotes || 0) + 1 } : c
       )
     );
   }, []);
@@ -109,7 +117,7 @@ export function ComplaintsProvider({ children }: { children: ReactNode }) {
   const addComment = useCallback((complaintId: string, comment: Comment) => {
     setComplaints(prev =>
       prev.map(c =>
-        c.id === complaintId ? { ...c, comments: [...c.comments, comment] } : c
+        c.id === complaintId ? { ...c, comments: [...(c.comments || []), comment] } : c
       )
     );
   }, []);

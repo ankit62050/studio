@@ -63,6 +63,8 @@ export function ComplaintCard({ complaint }: { complaint: Complaint }) {
 
   const images = [complaint.beforeImageUrl, ...complaint.progressImageUrls?.map(p => p.imageUrl) ?? [], complaint.afterImageUrl].filter(Boolean) as string[];
 
+  const comments = complaint.comments || [];
+
   return (
     <Card className="flex flex-col h-full">
       <CardHeader>
@@ -108,10 +110,10 @@ export function ComplaintCard({ complaint }: { complaint: Complaint }) {
         <div className="flex justify-between w-full">
             <div className="flex gap-2">
                 <Button variant="outline" size="sm" onClick={() => toggleUpvote(complaint.id)}>
-                    <ArrowUp className="mr-2 h-4 w-4" /> {complaint.upvotes}
+                    <ArrowUp className="mr-2 h-4 w-4" /> {complaint.upvotes || 0}
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => setShowComments(!showComments)}>
-                    <MessageSquare className="mr-2 h-4 w-4" /> {complaint.comments.length}
+                    <MessageSquare className="mr-2 h-4 w-4" /> {comments.length}
                 </Button>
             </div>
             <Button variant={isFollowing ? 'default' : 'outline'} size="sm" onClick={() => setIsFollowing(!isFollowing)}>
@@ -123,10 +125,10 @@ export function ComplaintCard({ complaint }: { complaint: Complaint }) {
           <div className="w-full space-y-4 pt-4 border-t">
             <h4 className="font-semibold">Comments</h4>
             <div className="space-y-4 max-h-48 overflow-y-auto pr-2">
-                {complaint.comments.length === 0 ? (
+                {comments.length === 0 ? (
                     <p className="text-sm text-muted-foreground">No comments yet.</p>
                 ) : (
-                    complaint.comments.map(comment => {
+                    comments.map(comment => {
                         const commentUser = getUserById(comment.userId);
                         return (
                             <div key={comment.id} className="flex items-start gap-3">
