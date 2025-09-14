@@ -132,7 +132,9 @@ export default function SubmitComplaintPage() {
       description: 'Thank you for your submission. You will be redirected to your history.',
     });
     
-    router.push('/history');
+    setTimeout(() => {
+        router.push('/history');
+    }, 1000);
   };
 
   return (
@@ -182,11 +184,11 @@ export default function SubmitComplaintPage() {
                           id="photo-upload"
                           onChange={handlePhotoChange}
                         />
-                         <label htmlFor="photo-upload" className="cursor-pointer">
-                            <Button type="button" variant="outline" asChild>
-                                <span>{photoPreview ? 'Change Photo' : 'Upload Photo'}</span>
-                            </Button>
-                        </label>
+                         <Button asChild type="button" variant="outline">
+                           <label htmlFor="photo-upload" className="cursor-pointer">
+                              {photoPreview ? 'Change Photo' : 'Upload Photo'}
+                           </label>
+                         </Button>
                       </div>
                     </FormControl>
                     <FormDescription>
@@ -224,7 +226,7 @@ export default function SubmitComplaintPage() {
                         ))}
                       </SelectContent>
                     </Select>
-                    {form.formState.dirtyFields.category && !isCategorizing && (
+                    {form.formState.isDirty && form.getValues('photo') && !isCategorizing && (
                        <FormDescription className="flex items-center gap-2 text-green-600">
                           <Sparkles className="h-4 w-4" />
                           Category suggested by AI based on your image!

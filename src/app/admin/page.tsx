@@ -47,6 +47,7 @@ export default function AdminDashboardPage() {
   const [processingComplaintId, setProcessingComplaintId] = useState<string | null>(null);
   const [suggestion, setSuggestion] = useState<ProcessComplaintOutput | null>(null);
   const [isSuggestionDialogOpen, setIsSuggestionDialogOpen] = useState(false);
+  const [currentComplaintIdForDialog, setCurrentComplaintIdForDialog] = useState<string | null>(null);
 
   const handleStatusChange = (complaintId: string, newStatus: ComplaintStatus) => {
     updateComplaintStatus(complaintId, newStatus);
@@ -79,6 +80,7 @@ export default function AdminDashboardPage() {
 
   const handleProcessComplaint = async (complaint: Complaint) => {
     setProcessingComplaintId(complaint.id);
+    setCurrentComplaintIdForDialog(complaint.id);
     try {
       const result = await processComplaint({
         complaint: {
@@ -102,9 +104,9 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleAcceptSuggestion = (complaintId: string) => {
-    if (!suggestion) return;
-    updateComplaint(complaintId, {
+  const handleAcceptSuggestion = () => {
+    if (!suggestion || !currentComplaintIdForDialog) return;
+    updateComplaint(currentComplaintIdForDialog, {
         category: suggestion.suggestedCategory,
         status: 'Under Review'
     });
@@ -114,6 +116,7 @@ export default function AdminDashboardPage() {
     });
     setIsSuggestionDialogOpen(false);
     setSuggestion(null);
+    setCurrentComplaintIdForDialog(null);
   };
 
 
@@ -122,7 +125,7 @@ export default function AdminDashboardPage() {
     return acc;
   }, {} as Record<ComplaintStatus, number>);
 
-  const currentComplaintForDialog = complaints.find(c => c.id === processingComplaintId || (suggestion && c.id === complaints.find(comp => comp.description === suggestion.reasoning.split('`')[1])?.id));
+  const currentComplaintForDialog = complaints.find(c => c.id === currentComplaintIdForDialog);
 
 
   return (
@@ -341,7 +344,7 @@ export default function AdminDashboardPage() {
                 </div>
                 <DialogFooter>
                     <Button variant="ghost" onClick={() => setIsSuggestionDialogOpen(false)}>Cancel</Button>
-                    <Button onClick={() => handleAcceptSuggestion(currentComplaintForDialog.id)}>Accept & Update</Button>
+                    <Button onClick={handleAcceptSuggestion}>Accept & Update</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
@@ -350,5 +353,3 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
-
-    

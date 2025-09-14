@@ -18,7 +18,6 @@ import { useComplaints } from '@/hooks/use-complaints';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -149,11 +148,11 @@ export default function HistoryPage() {
                 {complaint.progressImageUrls && complaint.progressImageUrls.length > 0 && (
                     <div>
                         <h4 className="font-semibold mb-2">Progress Updates</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                             {complaint.progressImageUrls.map((progress, index) => (
                                 <div key={index}>
                                     <h5 className="font-medium text-sm text-muted-foreground mb-1">{progress.status}</h5>
-                                     <Image src={progress.imageUrl} alt={`Progress update for ${progress.status}`} width={600} height={400} className="rounded-lg object-cover"/>
+                                     <Image src={progress.imageUrl} alt={`Progress update for ${progress.status}`} width={300} height={200} className="rounded-lg object-cover"/>
                                 </div>
                             ))}
                         </div>

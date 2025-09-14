@@ -28,7 +28,7 @@ export function MobileNav() {
 
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <nav className="grid grid-cols-4 h-16 items-center text-xs">
+      <nav className={`grid h-16 items-center text-xs grid-cols-${routes.length}`}>
         {routes.map((route) => {
           const isActive = pathname === route.href;
           return (

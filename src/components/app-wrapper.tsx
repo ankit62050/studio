@@ -1,15 +1,15 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { AppLayout } from '@/components/layouts/app-layout';
 import { AdminLayout } from '@/components/layouts/admin-layout';
-import LoginPage from '@/app/login/page';
 import { Skeleton } from './ui/skeleton';
 
 export function AppWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { user } = useAuth();
   const [isMounted, setIsMounted] = React.useState(false);
 
@@ -17,7 +17,13 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
     setIsMounted(true);
   }, []);
 
-  if (!isMounted) {
+  useEffect(() => {
+    if (isMounted && !user && pathname !== '/login') {
+      router.push('/login');
+    }
+  }, [isMounted, user, pathname, router]);
+
+  if (!isMounted || (!user && pathname !== '/login')) {
     return (
       <div className="w-full h-screen p-8">
         <div className="flex items-center space-x-4 mb-8">
@@ -31,13 +37,14 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-
-  if (pathname === '/login' || pathname === '/signup') {
+  
+  if (pathname === '/login') {
     return <>{children}</>;
   }
 
+  // This should not happen if the effect above works correctly, but as a safeguard.
   if (!user) {
-    return <LoginPage />;
+    return null;
   }
 
   const isAdminPath = pathname.startsWith('/admin');
@@ -64,9 +71,14 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
   }
 
   if (user.role === 'admin') {
-     return <AdminLayout>{children}</AdminLayout>;
+     // Admin visiting a citizen page, we can redirect or show the app layout.
+     // Redirecting to admin dashboard is a sensible default.
+      if (typeof window !== 'undefined') {
+        router.push('/admin');
+      }
+      return null;
   }
 
-  // Fallback loading state
-  return <div>Loading...</div>;
+  // Fallback, should not be reached.
+  return null;
 }

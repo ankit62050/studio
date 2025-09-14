@@ -39,6 +39,10 @@ export const complaints: Complaint[] = [
     resolvedAt: '2024-07-18T14:00:00Z',
     beforeImageUrl: 'https://picsum.photos/seed/complaint1-before/600/400',
     afterImageUrl: 'https://picsum.photos/seed/complaint1-after/600/400',
+    feedback: {
+        rating: 4,
+        comment: "The issue was resolved quickly once it was assigned. Good job!"
+    }
   },
   {
     id: 'complaint-2',
@@ -49,6 +53,9 @@ export const complaints: Complaint[] = [
     status: 'Work in Progress',
     submittedAt: '2024-07-20T11:00:00Z',
     beforeImageUrl: 'https://picsum.photos/seed/complaint2-before/600/400',
+    progressImageUrls: [
+        { status: 'Work in Progress', imageUrl: 'https://picsum.photos/seed/complaint2-progress/600/400' }
+    ]
   },
   {
     id: 'complaint-3',
@@ -68,6 +75,7 @@ export const complaints: Complaint[] = [
     location: 'Intersection of Oak and Pine',
     status: 'Received',
     submittedAt: '2024-07-23T08:00:00Z',
+    beforeImageUrl: 'https://picsum.photos/seed/complaint4-before/600/400',
   },
   {
     id: 'complaint-5',
@@ -80,5 +88,9 @@ export const complaints: Complaint[] = [
     resolvedAt: '2024-07-11T10:00:00Z',
     beforeImageUrl: 'https://picsum.photos/seed/complaint5-before/600/400',
     afterImageUrl: 'https://picsum.photos/seed/complaint5-after/600/400',
+    feedback: {
+        rating: 5,
+        comment: "Resolved very quickly!"
+    }
   },
 ];

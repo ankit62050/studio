@@ -2,7 +2,7 @@
 
 import type { Complaint, ComplaintStatus, Feedback } from '@/lib/types';
 import { complaints as initialComplaints } from '@/lib/data';
-import React, { createContext, useContext, useState, ReactNode, useMemo, useCallback } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useMemo, useCallback, useEffect } from 'react';
 
 interface ComplaintsContextType {
   complaints: Complaint[];
@@ -16,7 +16,30 @@ interface ComplaintsContextType {
 const ComplaintsContext = createContext<ComplaintsContextType | undefined>(undefined);
 
 export function ComplaintsProvider({ children }: { children: ReactNode }) {
-  const [complaints, setComplaints] = useState<Complaint[]>(initialComplaints);
+  const [complaints, setComplaints] = useState<Complaint[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    try {
+      const storedComplaints = localStorage.getItem('complaints');
+      if (storedComplaints) {
+        setComplaints(JSON.parse(storedComplaints));
+      } else {
+        setComplaints(initialComplaints);
+      }
+    } catch (error) {
+      console.error("Could not parse complaints from localStorage", error);
+      setComplaints(initialComplaints);
+    } finally {
+        setIsLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem('complaints', JSON.stringify(complaints));
+    }
+  }, [complaints, isLoaded]);
 
   const addComplaint = useCallback((complaint: Complaint) => {
     setComplaints(prev => [complaint, ...prev]);
@@ -88,5 +111,3 @@ export function useComplaints() {
   }
   return context;
 }
-
-    
