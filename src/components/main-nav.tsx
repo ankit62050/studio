@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
-import { Logo } from '@/components/logo';
 
 export function MainNav({
   className,
@@ -35,9 +34,6 @@ export function MainNav({
       className={cn('hidden md:flex items-center gap-6 text-sm', className)}
       {...props}
     >
-      <Link href={user.role === 'admin' ? '/admin' : '/'} className="mr-4">
-        <Logo />
-      </Link>
       {routes.map((route) => (
         <Link
           key={route.href}
