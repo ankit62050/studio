@@ -3,9 +3,14 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Complaint } from '@/lib/types';
 import { useComplaints } from '@/hooks/use-complaints';
-import MapView from '@/components/map-view';
+import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
 
+// Dynamically import the MapView component with SSR disabled
+const MapView = dynamic(() => import('@/components/map-view'), { 
+  ssr: false,
+  loading: () => <div className="h-full w-full bg-muted animate-pulse rounded-lg" />
+});
 
 export default function CitizenMapPage() {
   const { complaints } = useComplaints();

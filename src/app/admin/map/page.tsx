@@ -1,22 +1,25 @@
 'use client';
 
-import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Hourglass, CheckCircle, BarChart } from 'lucide-react';
 import { Complaint, ComplaintStatus, complaintStatuses } from '@/lib/types';
 import { useComplaints } from '@/hooks/use-complaints';
-import MapView from '@/components/map-view';
+import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
+
+// Dynamically import the MapView component with SSR disabled
+const MapView = dynamic(() => import('@/components/map-view'), { 
+  ssr: false,
+  loading: () => <div className="h-full w-full bg-muted animate-pulse rounded-lg" />
+});
 
 export default function AdminMapPage() {
   const { complaints } = useComplaints();
 
-  const statusCounts = useMemo(() => {
-    return complaintStatuses.reduce((acc, status) => {
-      acc[status] = complaints.filter(c => c.status === status).length;
-      return acc;
-    }, {} as Record<ComplaintStatus, number>);
-  }, [complaints]);
+  const statusCounts = complaintStatuses.reduce((acc, status) => {
+    acc[status] = complaints.filter(c => c.status === status).length;
+    return acc;
+  }, {} as Record<ComplaintStatus, number>);
 
   const pendingCount = statusCounts['Received'] + statusCounts['Under Review'];
   const inProgressCount = statusCounts['Work in Progress'];
