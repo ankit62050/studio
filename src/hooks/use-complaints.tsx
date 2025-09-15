@@ -15,6 +15,7 @@ interface ComplaintsContextType {
   toggleUpvote: (complaintId: string) => void;
   addComment: (complaintId: string, comment: Comment) => void;
   deleteComment: (complaintId: string, commentId: string) => void;
+  deleteComplaint: (complaintId: string) => void;
 }
 
 const ComplaintsContext = createContext<ComplaintsContextType | undefined>(undefined);
@@ -161,7 +162,18 @@ export function ComplaintsProvider({ children }: { children: ReactNode }) {
     );
   }, [user]);
 
-  const value = useMemo(() => ({ complaints, addComplaint, updateComplaintStatus, updateComplaint, addComplaintImage, addFeedback, toggleUpvote, addComment, deleteComment }), [complaints, addComplaint, updateComplaintStatus, updateComplaint, addComplaintImage, addFeedback, toggleUpvote, addComment, deleteComment]);
+  const deleteComplaint = useCallback((complaintId: string) => {
+    if (!user) return;
+     setComplaints(prev => prev.filter(c => {
+        if (c.id === complaintId) {
+            // Ensure the user owns this complaint before deleting
+            return c.userId !== user.id;
+        }
+        return true;
+     }));
+  }, [user]);
+
+  const value = useMemo(() => ({ complaints, addComplaint, updateComplaintStatus, updateComplaint, addComplaintImage, addFeedback, toggleUpvote, addComment, deleteComment, deleteComplaint }), [complaints, addComplaint, updateComplaintStatus, updateComplaint, addComplaintImage, addFeedback, toggleUpvote, addComment, deleteComment, deleteComplaint]);
 
   return (
     <ComplaintsContext.Provider value={value}>

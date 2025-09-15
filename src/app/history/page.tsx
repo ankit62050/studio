@@ -17,9 +17,20 @@ import { useComplaints } from '@/hooks/use-complaints';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Star } from 'lucide-react';
+import { Star, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 const getStatusColor = (status: ComplaintStatus) => {
   switch (status) {
@@ -93,7 +104,8 @@ function FeedbackForm({ complaintId, onSubmit }: { complaintId: string, onSubmit
 
 function HistoryPageContent() {
   const { user } = useAuth();
-  const { complaints } = useComplaints();
+  const { complaints, deleteComplaint } = useComplaints();
+  const { toast } = useToast();
   const searchParams = useSearchParams();
   const initialStatus = searchParams.get('status') || 'all';
   
@@ -120,6 +132,14 @@ function HistoryPageContent() {
     }
     return userComplaints;
   }, [userComplaints, filter]);
+
+  const handleDelete = (complaintId: string) => {
+    deleteComplaint(complaintId);
+    toast({
+        title: 'Complaint Deleted',
+        description: 'Your complaint has been successfully removed.',
+    });
+  }
 
   return (
     <div className="space-y-8">
@@ -156,9 +176,33 @@ function HistoryPageContent() {
                     <CardTitle className="text-xl">{complaint.category}</CardTitle>
                     <p className="text-sm text-muted-foreground">{complaint.location}</p>
                   </div>
-                  <Badge className={cn("text-xs font-semibold", getStatusColor(complaint.status))}>
-                    {complaint.status}
-                  </Badge>
+                   <div className="flex items-center gap-2">
+                    <Badge className={cn("text-xs font-semibold", getStatusColor(complaint.status))}>
+                        {complaint.status}
+                    </Badge>
+                     <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive">
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This action cannot be undone. This will permanently delete your complaint
+                                and remove its data from our servers.
+                            </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDelete(complaint.id)}>
+                                Delete
+                            </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
