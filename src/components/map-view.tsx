@@ -4,89 +4,77 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { Complaint } from '@/lib/types';
 import L, { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet.heat';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
+
+// Default icon fix
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png').default,
+    iconUrl: require('leaflet/dist/images/marker-icon.png').default,
+    shadowUrl: require('leaflet/dist/images/marker-shadow.png').default,
+});
+
 
 const getStatusColor = (status: Complaint['status']) => {
     switch (status) {
         case 'Resolved':
-            return 'hsl(var(--accent))';
+            return 'green';
         case 'Work in Progress':
-            return 'hsl(var(--info))';
+            return 'blue';
         case 'Under Review':
+            return 'orange';
         case 'Received':
-            return 'hsl(var(--primary))';
+            return 'grey';
         default:
-            return '#808080'; // Gray
+            return 'grey';
     }
 }
 
 const createCustomIcon = (color: string) => {
-    const html = `
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32">
-        <path fill="${color}" stroke="#fff" stroke-width="1.5" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/>
-      </svg>
-    `;
-    return new Icon({
-        iconUrl: `data:image/svg+xml;base64,${btoa(html)}`,
-        iconSize: [32, 32],
-        iconAnchor: [16, 32],
-        popupAnchor: [0, -32],
+    const markerHtmlStyles = `
+      background-color: ${color};
+      width: 2rem;
+      height: 2rem;
+      display: block;
+      left: -1rem;
+      top: -1rem;
+      position: relative;
+      border-radius: 2rem 2rem 0;
+      transform: rotate(45deg);
+      border: 1px solid #FFFFFF;`;
+    
+    return new L.DivIcon({
+      className: "my-custom-pin",
+      iconAnchor: [0, 24],
+      popupAnchor: [0, -36],
+      html: `<span style="${markerHtmlStyles}" />`
     });
 };
 
-interface HeatmapComponentProps {
-    geoComplaints: (Complaint & { latitude: number; longitude: number; })[];
-}
-
-function HeatmapComponent({ geoComplaints }: HeatmapComponentProps) {
-    const map = useMap();
-
-    useEffect(() => {
-        if (!map || geoComplaints.length === 0) return;
-
-        const points = geoComplaints.map(c => [c.latitude, c.longitude, 1]) as L.HeatLatLngTuple[];
-        const heatLayer = (L as any).heatLayer(points, {
-            radius: 30,
-            blur: 20,
-        }).addTo(map);
-
-        return () => {
-            map.removeLayer(heatLayer);
-        };
-    }, [map, geoComplaints]);
-
-    return null;
-}
-
-interface MapUpdaterProps {
-    geoComplaints: (Complaint & { latitude: number; longitude: number; })[];
-}
-
-function MapUpdater({ geoComplaints }: MapUpdaterProps) {
+function MapUpdater({ complaints }: { complaints: (Complaint & { latitude: number; longitude: number; })[] }) {
   const map = useMap();
   useEffect(() => {
-    if (geoComplaints.length > 0) {
-      const bounds = L.latLngBounds(geoComplaints.map(c => [c.latitude, c.longitude]));
+    if (complaints.length > 0) {
+      const bounds = L.latLngBounds(complaints.map(c => [c.latitude, c.longitude]));
       if (map && bounds.isValid()) {
         map.fitBounds(bounds, { padding: [50, 50] });
       }
     }
-  }, [map, geoComplaints]);
+  }, [map, complaints]);
   return null;
 }
 
 
 export interface MapViewProps {
-    complaints: Complaint[];
+    complaints: (Complaint & { latitude: number, longitude: number })[];
 }
 
 export default function MapView({ complaints }: MapViewProps) {
     const defaultPosition: [number, number] = [28.6139, 77.2090]; // Delhi
 
-    const geoComplaints = useMemo(() => {
-        return complaints.filter(c => c.latitude && c.longitude) as (Complaint & { latitude: number; longitude: number; })[];
-    }, [complaints]);
+    if (typeof window === 'undefined') {
+        return null;
+    }
 
     return (
         <MapContainer center={defaultPosition} zoom={12} style={{ height: '100%', width: '100%', borderRadius: '0.5rem' }}>
@@ -94,27 +82,18 @@ export default function MapView({ complaints }: MapViewProps) {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             />
-            
-            <HeatmapComponent geoComplaints={geoComplaints} />
-
-            {geoComplaints.map(complaint => (
+            {complaints.map(complaint => (
                  <Marker
                     key={complaint.id}
                     position={[complaint.latitude, complaint.longitude]}
                     icon={createCustomIcon(getStatusColor(complaint.status))}
                 >
                     <Popup>
-                         <div className="w-64">
-                            <h4 className="font-bold text-lg">{complaint.category}</h4>
-                            <p className="text-sm text-gray-500 mb-2">{complaint.location}</p>
-                            <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold" style={{borderColor: getStatusColor(complaint.status), color: getStatusColor(complaint.status)}}>{complaint.status}</span>
-                            <p className="mt-2 text-sm">{complaint.description}</p>
-                        </div>
+                        <b>{complaint.category}</b><br />{complaint.description}
                     </Popup>
                 </Marker>
             ))}
-
-            {geoComplaints.length > 0 && <MapUpdater geoComplaints={geoComplaints} />}
+            {complaints.length > 0 && <MapUpdater complaints={complaints} />}
         </MapContainer>
     );
 }

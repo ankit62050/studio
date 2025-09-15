@@ -1,11 +1,18 @@
 'use client';
 
+import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Hourglass, CheckCircle, BarChart, AlertTriangle } from 'lucide-react';
 import { ComplaintStatus, complaintStatuses } from '@/lib/types';
 import { useComplaints } from '@/hooks/use-complaints';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Map } from '@/components/map';
+import dynamic from 'next/dynamic';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const MapView = dynamic(() => import('@/components/map-view'), { 
+  ssr: false,
+  loading: () => <Skeleton className="h-full w-full" />
+});
 
 export default function AdminMapPage() {
   const { complaints } = useComplaints();
@@ -18,6 +25,10 @@ export default function AdminMapPage() {
   const pendingCount = statusCounts['Received'] + statusCounts['Under Review'];
   const inProgressCount = statusCounts['Work in Progress'];
   const resolvedCount = statusCounts['Resolved'];
+
+  const geoComplaints = useMemo(() => {
+    return complaints.filter(c => c.latitude && c.longitude);
+  }, [complaints]);
   
   return (
     <div className="space-y-8">
@@ -30,7 +41,7 @@ export default function AdminMapPage() {
         <AlertTriangle className="h-4 w-4" />
         <AlertTitle>Map Information</AlertTitle>
         <AlertDescription>
-          The map displays individual complaint markers and a heatmap overlay to show complaint density hotspots.
+          The map displays individual complaint markers.
         </AlertDescription>
       </Alert>
 
@@ -75,7 +86,7 @@ export default function AdminMapPage() {
       
       <Card>
         <CardContent className="p-2 h-[60vh]">
-           <Map complaints={complaints} />
+           <MapView complaints={geoComplaints} />
         </CardContent>
       </Card>
     </div>
