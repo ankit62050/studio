@@ -1,10 +1,9 @@
 'use client';
 
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import { Complaint } from '@/lib/types';
-import L, { Icon } from 'leaflet';
+import { useEffect, useRef } from 'react';
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { useEffect } from 'react';
+import { Complaint } from '@/lib/types';
 
 // Default icon fix
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -51,49 +50,70 @@ const createCustomIcon = (color: string) => {
     });
 };
 
-function MapUpdater({ complaints }: { complaints: (Complaint & { latitude: number; longitude: number; })[] }) {
-  const map = useMap();
-  useEffect(() => {
-    if (complaints.length > 0) {
-      const bounds = L.latLngBounds(complaints.map(c => [c.latitude, c.longitude]));
-      if (map && bounds.isValid()) {
-        map.fitBounds(bounds, { padding: [50, 50] });
-      }
-    }
-  }, [map, complaints]);
-  return null;
-}
-
-
 export interface MapViewProps {
     complaints: (Complaint & { latitude: number, longitude: number })[];
 }
 
 export default function MapView({ complaints }: MapViewProps) {
-    const defaultPosition: [number, number] = [28.6139, 77.2090]; // Delhi
+    const mapContainerRef = useRef<HTMLDivElement>(null);
+    const mapInstanceRef = useRef<L.Map | null>(null);
+    const defaultPosition: L.LatLngTuple = [28.6139, 77.2090]; // Delhi
+
+    useEffect(() => {
+        // Initialize map only if the container is available and map is not already initialized
+        if (mapContainerRef.current && !mapInstanceRef.current) {
+            const map = L.map(mapContainerRef.current).setView(defaultPosition, 12);
+            mapInstanceRef.current = map;
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+        }
+
+        // Cleanup function to remove map instance on component unmount
+        return () => {
+            if (mapInstanceRef.current) {
+                mapInstanceRef.current.remove();
+                mapInstanceRef.current = null;
+            }
+        };
+    }, [defaultPosition]); // Empty dependency array ensures this runs only once on mount and unmount
+
+    useEffect(() => {
+        const map = mapInstanceRef.current;
+        if (!map) return;
+
+        // Clear existing markers
+        map.eachLayer(layer => {
+            if (layer instanceof L.Marker) {
+                map.removeLayer(layer);
+            }
+        });
+
+        // Add new markers
+        if (complaints.length > 0) {
+            complaints.forEach(complaint => {
+                const marker = L.marker([complaint.latitude, complaint.longitude], {
+                    icon: createCustomIcon(getStatusColor(complaint.status))
+                });
+                marker.bindPopup(`<b>${complaint.category}</b><br />${complaint.description}`);
+                marker.addTo(map);
+            });
+
+            // Fit map to bounds
+            const bounds = L.latLngBounds(complaints.map(c => [c.latitude, c.longitude]));
+            if (bounds.isValid()) {
+                map.fitBounds(bounds, { padding: [50, 50] });
+            }
+        }
+
+    }, [complaints]); // Re-run this effect when complaints change
 
     if (typeof window === 'undefined') {
         return null;
     }
 
     return (
-        <MapContainer center={defaultPosition} zoom={12} style={{ height: '100%', width: '100%', borderRadius: '0.5rem' }}>
-            <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            />
-            {complaints.map(complaint => (
-                 <Marker
-                    key={complaint.id}
-                    position={[complaint.latitude, complaint.longitude]}
-                    icon={createCustomIcon(getStatusColor(complaint.status))}
-                >
-                    <Popup>
-                        <b>{complaint.category}</b><br />{complaint.description}
-                    </Popup>
-                </Marker>
-            ))}
-            {complaints.length > 0 && <MapUpdater complaints={complaints} />}
-        </MapContainer>
+        <div ref={mapContainerRef} style={{ height: '100%', width: '100%', borderRadius: '0.5rem' }} />
     );
 }
