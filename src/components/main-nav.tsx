@@ -35,7 +35,6 @@ export function MainNav({
       className={cn('hidden md:flex items-center gap-6 text-sm', className)}
       {...props}
     >
-      <Logo />
       {routes.map((route) => (
         <Link
           key={route.href}
