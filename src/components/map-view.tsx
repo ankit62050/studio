@@ -46,7 +46,7 @@ function HeatmapComponent({ geoComplaints }: HeatmapComponentProps) {
         if (!map || geoComplaints.length === 0) return;
 
         const points = geoComplaints.map(c => [c.latitude, c.longitude, 1]) as L.HeatLatLngTuple[];
-        const heatLayer = L.heatLayer(points, {
+        const heatLayer = (L as any).heatLayer(points, {
             radius: 30,
             blur: 20,
         }).addTo(map);
@@ -77,7 +77,7 @@ function MapUpdater({ geoComplaints }: MapUpdaterProps) {
 }
 
 
-interface MapViewProps {
+export interface MapViewProps {
     complaints: Complaint[];
 }
 

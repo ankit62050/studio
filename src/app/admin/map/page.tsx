@@ -4,15 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Hourglass, CheckCircle, BarChart, AlertTriangle } from 'lucide-react';
 import { ComplaintStatus, complaintStatuses } from '@/lib/types';
 import { useComplaints } from '@/hooks/use-complaints';
-import dynamic from 'next/dynamic';
-import 'leaflet/dist/leaflet.css';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-
-// Dynamically import the MapView component with SSR disabled
-const MapView = dynamic(() => import('@/components/map-view'), { 
-  ssr: false,
-  loading: () => <div className="h-full w-full bg-muted animate-pulse rounded-lg" />
-});
+import { Map } from '@/components/map';
 
 export default function AdminMapPage() {
   const { complaints } = useComplaints();
@@ -82,7 +75,7 @@ export default function AdminMapPage() {
       
       <Card>
         <CardContent className="p-2 h-[60vh]">
-           <MapView complaints={complaints} />
+           <Map complaints={complaints} />
         </CardContent>
       </Card>
     </div>

@@ -2,17 +2,9 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { useComplaints } from '@/hooks/use-complaints';
-import dynamic from 'next/dynamic';
-import 'leaflet/dist/leaflet.css';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
-
-
-// Dynamically import the MapView component with SSR disabled
-const MapView = dynamic(() => import('@/components/map-view'), { 
-  ssr: false,
-  loading: () => <div className="h-full w-full bg-muted animate-pulse rounded-lg" />
-});
+import { Map } from '@/components/map';
 
 export default function CitizenMapPage() {
   const { complaints } = useComplaints();
@@ -34,7 +26,7 @@ export default function CitizenMapPage() {
       
       <Card className="flex-grow">
         <CardContent className="p-2 h-full">
-            <MapView complaints={complaints} />
+            <Map complaints={complaints} />
         </CardContent>
       </Card>
     </div>
