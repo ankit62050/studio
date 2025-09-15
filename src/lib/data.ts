@@ -39,8 +39,8 @@ export const complaints: Complaint[] = [
     status: 'Resolved',
     submittedAt: '2024-07-15T09:30:00Z',
     resolvedAt: '2024-07-18T14:00:00Z',
-    beforeImageUrl: 'https://picsum.photos/seed/complaint1-before/600/400',
-    afterImageUrl: 'https://picsum.photos/seed/complaint1-after/600/400',
+    beforeImageUrl: 'https://picsum.photos/seed/garbage-overflow/600/400',
+    afterImageUrl: 'https://picsum.photos/seed/clean-street/600/400',
     feedback: {
         rating: 4,
         comment: "The issue was resolved quickly once it was assigned. Good job!"
@@ -61,9 +61,9 @@ export const complaints: Complaint[] = [
     longitude: 77.2105,
     status: 'Work in Progress',
     submittedAt: '2024-07-20T11:00:00Z',
-    beforeImageUrl: 'https://picsum.photos/seed/complaint2-before/600/400',
+    beforeImageUrl: 'https://picsum.photos/seed/road-pothole/600/400',
     progressImageUrls: [
-        { status: 'Work in Progress', imageUrl: 'https://picsum.photos/seed/complaint2-progress/600/400' }
+        { status: 'Work in Progress', imageUrl: 'https://picsum.photos/seed/road-work/600/400' }
     ],
     upvotedBy: ['user-2'],
     comments: []
@@ -78,7 +78,7 @@ export const complaints: Complaint[] = [
     longitude: 77.216,
     status: 'Under Review',
     submittedAt: '2024-07-22T18:45:00Z',
-    beforeImageUrl: 'https://picsum.photos/seed/complaint3-before/600/400',
+    beforeImageUrl: 'https://picsum.photos/seed/graffiti-wall/600/400',
     upvotedBy: [],
     comments: [
         { id: 'comment-3-1', userId: 'user-2', text: "This is unacceptable.", createdAt: '2024-07-22T19:00:00Z' },
@@ -94,7 +94,7 @@ export const complaints: Complaint[] = [
     longitude: 77.212,
     status: 'Received',
     submittedAt: '2024-07-23T08:00:00Z',
-    beforeImageUrl: 'https://picsum.photos/seed/complaint4-before/600/400',
+    beforeImageUrl: 'https://picsum.photos/seed/broken-light/600/400',
     upvotedBy: ['user-1'],
     comments: []
   },
@@ -109,8 +109,8 @@ export const complaints: Complaint[] = [
     status: 'Resolved',
     submittedAt: '2024-07-10T15:20:00Z',
     resolvedAt: '2024-07-11T10:00:00Z',
-    beforeImageUrl: 'https://picsum.photos/seed/complaint5-before/600/400',
-    afterImageUrl: 'https://picsum.photos/seed/complaint5-after/600/400',
+    beforeImageUrl: 'https://picsum.photos/seed/water-leak-sidewalk/600/400',
+    afterImageUrl: 'https://picsum.photos/seed/dry-sidewalk/600/400',
     feedback: {
         rating: 5,
         comment: "Resolved very quickly!"
