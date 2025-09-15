@@ -1,10 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Complaint } from '@/lib/types';
-import { Icon } from 'leaflet';
+import L, { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 
 const getStatusColor = (status: Complaint['status']) => {
     switch (status) {
@@ -39,30 +38,51 @@ interface MapViewProps {
 }
 
 export default function MapView({ complaints }: MapViewProps) {
+    const mapRef = useRef<HTMLDivElement>(null);
+    const mapInstanceRef = useRef<L.Map | null>(null);
+    const markersRef = useRef<L.Marker[]>([]);
+
     const defaultPosition: [number, number] = [28.6139, 77.2090]; // Delhi
 
+    useEffect(() => {
+        if (mapRef.current && !mapInstanceRef.current) {
+            // Initialize map only once
+            const map = L.map(mapRef.current).setView(defaultPosition, 12);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            mapInstanceRef.current = map;
+        }
+    }, [defaultPosition]);
+
+    useEffect(() => {
+        const map = mapInstanceRef.current;
+        if (map) {
+            // Clear existing markers
+            markersRef.current.forEach(marker => marker.removeFrom(map));
+            markersRef.current = [];
+
+            // Add new markers
+            complaints.forEach(complaint => {
+                const marker = L.marker([complaint.latitude, complaint.longitude], {
+                    icon: createCustomIcon(getStatusColor(complaint.status))
+                }).addTo(map);
+
+                const popupContent = `
+                    <div class="w-64">
+                        <h4 class="font-bold text-lg">${complaint.category}</h4>
+                        <p class="text-sm text-gray-500 mb-2">${complaint.location}</p>
+                        <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold" style="border-color: ${getStatusColor(complaint.status)}; color: ${getStatusColor(complaint.status)}">${complaint.status}</span>
+                        <p class="mt-2 text-sm">${complaint.description}</p>
+                    </div>
+                `;
+                marker.bindPopup(popupContent);
+                markersRef.current.push(marker);
+            });
+        }
+    }, [complaints]);
+
     return (
-        <MapContainer center={defaultPosition} zoom={12} style={{ height: '100%', width: '100%', borderRadius: '0.5rem' }}>
-            <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            />
-            {complaints.map(complaint => (
-                <Marker
-                    key={complaint.id}
-                    position={[complaint.latitude, complaint.longitude]}
-                    icon={createCustomIcon(getStatusColor(complaint.status))}
-                >
-                    <Popup>
-                        <div className="w-64">
-                            <h4 className="font-bold text-lg">{complaint.category}</h4>
-                            <p className="text-sm text-muted-foreground mb-2">{complaint.location}</p>
-                            <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold" style={{borderColor: getStatusColor(complaint.status), color: getStatusColor(complaint.status)}}>{complaint.status}</span>
-                            <p className="mt-2 text-sm">{complaint.description}</p>
-                        </div>
-                    </Popup>
-                </Marker>
-            ))}
-        </MapContainer>
+        <div ref={mapRef} style={{ height: '100%', width: '100%', borderRadius: '0.5rem' }} />
     );
 }
