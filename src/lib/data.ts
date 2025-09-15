@@ -6,7 +6,7 @@ export const users: User[] = [
     name: 'Aarav Sharma',
     email: 'aarav.sharma@example.com',
     role: 'citizen',
-    avatarUrl: 'https://picsum.photos/seed/avatar1/100/100',
+    avatarUrl: 'https://picsum.photos/seed/indianman/100/100',
   },
   {
     id: 'user-2',
