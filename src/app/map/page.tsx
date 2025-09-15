@@ -1,7 +1,6 @@
 'use client';
 
 import { Card, CardContent } from '@/components/ui/card';
-import { Complaint } from '@/lib/types';
 import { useComplaints } from '@/hooks/use-complaints';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
@@ -17,8 +16,6 @@ const MapView = dynamic(() => import('@/components/map-view'), {
 
 export default function CitizenMapPage() {
   const { complaints } = useComplaints();
-
-  const geoComplaints = complaints.filter(c => c.latitude && c.longitude) as (Complaint & { latitude: number; longitude: number; })[];
   
   return (
     <div className="space-y-8 h-[85vh] flex flex-col">
@@ -37,7 +34,7 @@ export default function CitizenMapPage() {
       
       <Card className="flex-grow">
         <CardContent className="p-2 h-full">
-            <MapView complaints={geoComplaints} />
+            <MapView complaints={complaints} />
         </CardContent>
       </Card>
     </div>

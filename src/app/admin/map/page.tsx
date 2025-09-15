@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Hourglass, CheckCircle, BarChart, AlertTriangle } from 'lucide-react';
-import { Complaint, ComplaintStatus, complaintStatuses } from '@/lib/types';
+import { ComplaintStatus, complaintStatuses } from '@/lib/types';
 import { useComplaints } from '@/hooks/use-complaints';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
@@ -25,8 +25,6 @@ export default function AdminMapPage() {
   const pendingCount = statusCounts['Received'] + statusCounts['Under Review'];
   const inProgressCount = statusCounts['Work in Progress'];
   const resolvedCount = statusCounts['Resolved'];
-
-  const geoComplaints = complaints.filter(c => c.latitude && c.longitude) as (Complaint & { latitude: number; longitude: number; })[];
   
   return (
     <div className="space-y-8">
@@ -84,7 +82,7 @@ export default function AdminMapPage() {
       
       <Card>
         <CardContent className="p-2 h-[60vh]">
-           <MapView complaints={geoComplaints} />
+           <MapView complaints={complaints} />
         </CardContent>
       </Card>
     </div>

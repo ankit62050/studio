@@ -5,7 +5,7 @@ import { Complaint } from '@/lib/types';
 import L, { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.heat';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 const getStatusColor = (status: Complaint['status']) => {
     switch (status) {
@@ -35,17 +35,17 @@ const createCustomIcon = (color: string) => {
     });
 };
 
-interface MapViewProps {
-    complaints: (Complaint & { latitude: number; longitude: number; })[];
+interface HeatmapComponentProps {
+    geoComplaints: (Complaint & { latitude: number; longitude: number; })[];
 }
 
-function HeatmapComponent({ complaints }: MapViewProps) {
+function HeatmapComponent({ geoComplaints }: HeatmapComponentProps) {
     const map = useMap();
 
     useEffect(() => {
-        if (!map || complaints.length === 0) return;
+        if (!map || geoComplaints.length === 0) return;
 
-        const points = complaints.map(c => [c.latitude, c.longitude, 1]) as L.HeatLatLngTuple[];
+        const points = geoComplaints.map(c => [c.latitude, c.longitude, 1]) as L.HeatLatLngTuple[];
         const heatLayer = L.heatLayer(points, {
             radius: 30,
             blur: 20,
@@ -54,26 +54,39 @@ function HeatmapComponent({ complaints }: MapViewProps) {
         return () => {
             map.removeLayer(heatLayer);
         };
-    }, [map, complaints]);
+    }, [map, geoComplaints]);
 
     return null;
 }
 
-function MapUpdater({ complaints }: MapViewProps) {
+interface MapUpdaterProps {
+    geoComplaints: (Complaint & { latitude: number; longitude: number; })[];
+}
+
+function MapUpdater({ geoComplaints }: MapUpdaterProps) {
   const map = useMap();
   useEffect(() => {
-    if (complaints.length > 0) {
-      const bounds = L.latLngBounds(complaints.map(c => [c.latitude, c.longitude]));
+    if (geoComplaints.length > 0) {
+      const bounds = L.latLngBounds(geoComplaints.map(c => [c.latitude, c.longitude]));
       if (map && bounds.isValid()) {
         map.fitBounds(bounds, { padding: [50, 50] });
       }
     }
-  }, [map, complaints]);
+  }, [map, geoComplaints]);
   return null;
+}
+
+
+interface MapViewProps {
+    complaints: Complaint[];
 }
 
 export default function MapView({ complaints }: MapViewProps) {
     const defaultPosition: [number, number] = [28.6139, 77.2090]; // Delhi
+
+    const geoComplaints = useMemo(() => {
+        return complaints.filter(c => c.latitude && c.longitude) as (Complaint & { latitude: number; longitude: number; })[];
+    }, [complaints]);
 
     return (
         <MapContainer center={defaultPosition} zoom={12} style={{ height: '100%', width: '100%', borderRadius: '0.5rem' }}>
@@ -82,9 +95,9 @@ export default function MapView({ complaints }: MapViewProps) {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             />
             
-            <HeatmapComponent complaints={complaints} />
+            <HeatmapComponent geoComplaints={geoComplaints} />
 
-            {complaints.map(complaint => (
+            {geoComplaints.map(complaint => (
                  <Marker
                     key={complaint.id}
                     position={[complaint.latitude, complaint.longitude]}
@@ -101,7 +114,7 @@ export default function MapView({ complaints }: MapViewProps) {
                 </Marker>
             ))}
 
-            {complaints.length > 0 && <MapUpdater complaints={complaints} />}
+            {geoComplaints.length > 0 && <MapUpdater geoComplaints={geoComplaints} />}
         </MapContainer>
     );
 }
