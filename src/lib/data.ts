@@ -3,15 +3,15 @@ import type { User, Complaint, Officer } from './types';
 export const users: User[] = [
   {
     id: 'user-1',
-    name: 'John Citizen',
-    email: 'john.citizen@example.com',
+    name: 'Aarav Sharma',
+    email: 'aarav.sharma@example.com',
     role: 'citizen',
     avatarUrl: 'https://picsum.photos/seed/avatar1/100/100',
   },
   {
     id: 'user-2',
-    name: 'Jane Admin',
-    email: 'jane.admin@example.com',
+    name: 'Priya Patel',
+    email: 'priya.patel@example.com',
     role: 'admin',
     avatarUrl: 'https://picsum.photos/seed/avatar2/100/100',
   },
