@@ -41,10 +41,10 @@ export function MainNav({
           key={route.href}
           href={route.href}
           className={cn(
-            'transition-colors hover:text-primary',
-            pathname === route.href
-              ? 'text-foreground font-semibold'
-              : 'text-muted-foreground'
+            'relative font-medium text-white/80 transition-colors hover:text-white',
+            pathname === route.href && 'text-white',
+            'after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-bottom-right after:scale-x-0 after:bg-primary after:transition-transform after:duration-300 after:ease-out hover:after:origin-bottom-left hover:after:scale-x-100',
+            pathname === route.href && 'after:origin-bottom-left after:scale-x-100'
           )}
         >
           {route.label}

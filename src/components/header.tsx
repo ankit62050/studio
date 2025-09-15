@@ -3,7 +3,7 @@ import { UserNav } from '@/components/user-nav';
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-40 w-full border-b border-info/20 bg-info text-info-foreground">
       <div className="relative">
         <div className="absolute top-0 left-0 w-full h-1 flex">
           <div className="flex-1 bg-primary"></div>
