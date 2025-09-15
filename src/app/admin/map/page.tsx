@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Hourglass, CheckCircle, BarChart } from 'lucide-react';
 import { Complaint, ComplaintStatus, complaintStatuses } from '@/lib/types';
