@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { Complaint } from '@/lib/types';
-import { Icon, type Map } from 'leaflet';
+import { Icon } from 'leaflet';
 import { Badge } from '@/components/ui/badge';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -40,11 +39,10 @@ interface MapViewProps {
 }
 
 export default function MapView({ complaints }: MapViewProps) {
-    const [map, setMap] = useState<Map | null>(null);
     const defaultPosition: [number, number] = [28.6139, 77.2090]; // Centered on Delhi
 
     return (
-        <MapContainer whenCreated={setMap} center={defaultPosition} zoom={12} style={{ height: '100%', width: '100%', borderRadius: '0.5rem' }}>
+        <MapContainer center={defaultPosition} zoom={12} style={{ height: '100%', width: '100%', borderRadius: '0.5rem' }}>
             <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
