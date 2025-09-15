@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Logo } from '@/components/logo';
 import { UserNav } from '@/components/user-nav';
-import { Shield, Map as MapIcon, Mail, HelpCircle } from 'lucide-react';
+import { Shield, MapIcon, Mail, HelpCircle } from 'lucide-react';
 import { Chatbot } from '../chatbot';
 
 interface AdminLayoutProps {
