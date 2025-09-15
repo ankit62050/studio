@@ -5,13 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Hourglass, CheckCircle, BarChart } from 'lucide-react';
 import { Complaint, ComplaintStatus, complaintStatuses } from '@/lib/types';
 import { useComplaints } from '@/hooks/use-complaints';
-import dynamic from 'next/dynamic';
+import MapView from '@/components/map-view';
 import 'leaflet/dist/leaflet.css';
-
-const MapView = dynamic(() => import('@/components/map-view'), { 
-    ssr: false,
-    loading: () => <div className="h-full w-full bg-muted animate-pulse" />
-});
 
 export default function AdminMapPage() {
   const { complaints } = useComplaints();

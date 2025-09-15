@@ -3,13 +3,9 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Complaint } from '@/lib/types';
 import { useComplaints } from '@/hooks/use-complaints';
-import dynamic from 'next/dynamic';
+import MapView from '@/components/map-view';
 import 'leaflet/dist/leaflet.css';
 
-const MapView = dynamic(() => import('@/components/map-view'), { 
-    ssr: false,
-    loading: () => <div className="h-full w-full bg-muted animate-pulse" />
-});
 
 export default function CitizenMapPage() {
   const { complaints } = useComplaints();
