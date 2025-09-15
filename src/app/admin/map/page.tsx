@@ -1,11 +1,12 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Hourglass, CheckCircle, BarChart } from 'lucide-react';
+import { FileText, Hourglass, CheckCircle, BarChart, AlertTriangle } from 'lucide-react';
 import { Complaint, ComplaintStatus, complaintStatuses } from '@/lib/types';
 import { useComplaints } from '@/hooks/use-complaints';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 // Dynamically import the MapView component with SSR disabled
 const MapView = dynamic(() => import('@/components/map-view'), { 
@@ -33,6 +34,14 @@ export default function AdminMapPage() {
         <h1 className="text-3xl font-bold tracking-tight">Complaints Map View</h1>
         <p className="text-muted-foreground">Geospatial overview of all citizen complaints.</p>
       </div>
+
+      <Alert>
+        <AlertTriangle className="h-4 w-4" />
+        <AlertTitle>Map Information</AlertTitle>
+        <AlertDescription>
+          The map displays individual complaint markers and a heatmap overlay to show complaint density hotspots.
+        </AlertDescription>
+      </Alert>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
