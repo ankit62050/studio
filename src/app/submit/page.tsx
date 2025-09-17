@@ -398,15 +398,14 @@ export default function SubmitComplaintPage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Photos</FormLabel>
-                    <div className="flex flex-wrap items-start gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {photoPreviews.map((preview, index) => (
-                        <div key={index} className="relative w-48 h-36">
+                        <div key={index} className="relative aspect-video">
                           <Image
                             src={preview}
                             alt={`Photo preview ${index + 1}`}
-                            width={192}
-                            height={144}
-                            className="object-cover rounded-md w-full h-full"
+                            fill
+                            className="object-cover rounded-md"
                           />
                           <Button
                             type="button"
@@ -421,7 +420,7 @@ export default function SubmitComplaintPage() {
                         </div>
                       ))}
                       {photoPreviews.length < MAX_PHOTOS && (
-                        <div className="w-48 h-36 rounded-md border border-dashed flex flex-col items-center justify-center bg-muted/50 p-2 gap-2">
+                        <div className="aspect-video rounded-md border border-dashed flex flex-col items-center justify-center bg-muted/50 p-2 gap-2">
                            <Input
                                 type="file"
                                 accept="image/*"

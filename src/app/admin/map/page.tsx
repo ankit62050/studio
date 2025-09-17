@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useState } from 'react';
@@ -82,13 +83,13 @@ export default function AdminMapPage() {
         <CardHeader>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <CardTitle>Map</CardTitle>
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
                     <div className="flex items-center space-x-2">
                         <Switch id="hotspot-toggle" checked={showHotspots} onCheckedChange={setShowHotspots} />
                         <Label htmlFor="hotspot-toggle">Show Hotspots</Label>
                     </div>
                     <Select value={categoryFilter} onValueChange={(value) => setCategoryFilter(value as ComplaintCategory | 'All')}>
-                        <SelectTrigger className="w-[180px]">
+                        <SelectTrigger className="w-full sm:w-[180px]">
                             <SelectValue placeholder="Filter by category" />
                         </SelectTrigger>
                         <SelectContent>

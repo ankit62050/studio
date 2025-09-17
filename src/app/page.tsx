@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -121,14 +122,14 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       <Card className="bg-gradient-to-br from-background to-primary/10">
-        <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="space-y-2">
+        <CardContent className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
+            <div className="space-y-2 text-center md:text-left">
                 <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Welcome, {user.name}!</h1>
                 <p className="text-muted-foreground max-w-2xl">
                     Ready to make a difference? Report an issue or see what's happening in your community.
                 </p>
             </div>
-             <Button asChild size="lg">
+             <Button asChild size="lg" className="w-full sm:w-auto">
                 <Link href="/submit">
                   <PlusCircle className="mr-2" /> Report a Civic Issue
                 </Link>

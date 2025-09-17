@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -11,6 +12,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarInset,
+  SidebarTrigger
 } from '@/components/ui/sidebar';
 import { Logo } from '@/components/logo';
 import { UserNav } from '@/components/user-nav';
@@ -55,7 +57,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         </SidebarContent>
       </Sidebar>
       <SidebarInset>
-        <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:hidden">
+        <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="relative">
                 <div className="absolute top-0 left-0 w-full h-1 flex">
                     <div className="flex-1 bg-primary"></div>
@@ -64,6 +66,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 </div>
             </div>
           <div className="container flex h-14 items-center pt-1">
+             <div className="md:hidden mr-2">
+                <SidebarTrigger />
+            </div>
             <div className="flex-1">
               <Logo/>
             </div>

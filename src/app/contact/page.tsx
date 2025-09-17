@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -131,46 +132,48 @@ export default function ContactPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-muted/30">
-          <CardHeader>
-             <div className='mb-4'>
-                <Logo/>
-             </div>
-            <CardTitle>Our Contact Information</CardTitle>
-            <CardDescription>
-              You can also reach us through the following channels.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6 text-sm">
-             <div className="flex items-start gap-4">
-                <div className='p-3 bg-primary/10 rounded-full text-primary'>
-                    <MapPin className="h-5 w-5" />
+        <div className="space-y-8">
+            <Card className="bg-muted/30">
+              <CardHeader>
+                 <div className='mb-4'>
+                    <Logo/>
+                 </div>
+                <CardTitle>Our Contact Information</CardTitle>
+                <CardDescription>
+                  You can also reach us through the following channels.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6 text-sm">
+                 <div className="flex items-start gap-4">
+                    <div className='p-3 bg-primary/10 rounded-full text-primary'>
+                        <MapPin className="h-5 w-5" />
+                    </div>
+                  <div>
+                    <h4 className="font-semibold">Our Office</h4>
+                    <p className="text-muted-foreground">123 Civic Center Plaza, New Delhi, India</p>
+                  </div>
                 </div>
-              <div>
-                <h4 className="font-semibold">Our Office</h4>
-                <p className="text-muted-foreground">123 Civic Center Plaza, New Delhi, India</p>
-              </div>
-            </div>
-             <div className="flex items-start gap-4">
-               <div className='p-3 bg-primary/10 rounded-full text-primary'>
-                  <Phone className="h-5 w-5" />
+                 <div className="flex items-start gap-4">
+                   <div className='p-3 bg-primary/10 rounded-full text-primary'>
+                      <Phone className="h-5 w-5" />
+                    </div>
+                  <div>
+                    <h4 className="font-semibold">Phone</h4>
+                    <p className="text-muted-foreground">+91 (123) 456-7890</p>
+                  </div>
                 </div>
-              <div>
-                <h4 className="font-semibold">Phone</h4>
-                <p className="text-muted-foreground">+91 (123) 456-7890</p>
-              </div>
-            </div>
-             <div className="flex items-start gap-4">
-                <div className='p-3 bg-primary/10 rounded-full text-primary'>
-                  <Mail className="h-5 w-5" />
+                 <div className="flex items-start gap-4">
+                    <div className='p-3 bg-primary/10 rounded-full text-primary'>
+                      <Mail className="h-5 w-5" />
+                    </div>
+                  <div>
+                    <h4 className="font-semibold">Email</h4>
+                    <p className="text-muted-foreground">support@janconnect.gov.in</p>
+                  </div>
                 </div>
-              <div>
-                <h4 className="font-semibold">Email</h4>
-                <p className="text-muted-foreground">support@janconnect.gov.in</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+        </div>
       </div>
     </div>
   );

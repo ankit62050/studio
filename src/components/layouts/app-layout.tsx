@@ -1,3 +1,4 @@
+
 import { Chatbot } from "../chatbot";
 import { Header } from "@/components/header";
 import { MobileNav } from "@/components/mobile-nav";
@@ -8,7 +9,7 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   return (
-    <div className="relative flex min-h-screen flex-col">
+    <div className="relative flex min-h-screen flex-col bg-background">
       <Header />
       <main className="flex-1 container py-8 pb-24">{children}</main>
       <MobileNav />

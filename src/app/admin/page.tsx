@@ -450,7 +450,7 @@ export default function AdminDashboardPage() {
                     The AI has analyzed the complaint and provided the following recommendations. Review and accept to update the complaint.
                 </DialogDescription>
                 </DialogHeader>
-                <div className="grid grid-cols-2 gap-x-8 gap-y-4 py-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 py-4">
                     <div className="space-y-4">
                         <h4 className="font-semibold text-lg">Complaint</h4>
                         <p className="text-sm text-muted-foreground p-4 bg-muted/50 rounded-lg">{currentComplaintForDialog.description}</p>
