@@ -2,6 +2,7 @@
 import { memo } from "react";
 import dynamic from "next/dynamic";
 import 'leaflet/dist/leaflet.css';
+import 'leaflet.heat';
 import type { MapViewProps } from './map-view';
 import { Skeleton } from "./ui/skeleton";
 

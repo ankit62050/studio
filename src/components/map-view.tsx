@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet.heat';
 import { Complaint } from '@/lib/types';
 
 // Default icon fix
@@ -52,15 +53,17 @@ const createCustomIcon = (color: string) => {
 
 export interface MapViewProps {
     complaints: (Complaint & { latitude: number, longitude: number })[];
+    showHotspots?: boolean;
 }
 
-export default function MapView({ complaints }: MapViewProps) {
+export default function MapView({ complaints, showHotspots = false }: MapViewProps) {
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<L.Map | null>(null);
+    const heatLayerRef = useRef<L.HeatLayer | null>(null);
+    const markersRef = useRef<L.Marker[]>([]);
     const defaultPosition: L.LatLngTuple = [28.6139, 77.2090]; // Delhi
 
     useEffect(() => {
-        // Initialize map only if the container is available and map is not already initialized
         if (mapContainerRef.current && !mapInstanceRef.current) {
             const map = L.map(mapContainerRef.current).setView(defaultPosition, 12);
             mapInstanceRef.current = map;
@@ -70,35 +73,47 @@ export default function MapView({ complaints }: MapViewProps) {
             }).addTo(map);
         }
 
-        // Cleanup function to remove map instance on component unmount
         return () => {
             if (mapInstanceRef.current) {
                 mapInstanceRef.current.remove();
                 mapInstanceRef.current = null;
             }
         };
-    }, [defaultPosition]); // Empty dependency array ensures this runs only once on mount and unmount
+    }, []);
 
     useEffect(() => {
         const map = mapInstanceRef.current;
         if (!map) return;
 
-        // Clear existing markers
-        map.eachLayer(layer => {
-            if (layer instanceof L.Marker) {
-                map.removeLayer(layer);
-            }
-        });
+        // Clear existing layers
+        markersRef.current.forEach(marker => map.removeLayer(marker));
+        markersRef.current = [];
+        if (heatLayerRef.current) {
+            map.removeLayer(heatLayerRef.current);
+            heatLayerRef.current = null;
+        }
 
-        // Add new markers
         if (complaints.length > 0) {
-            complaints.forEach(complaint => {
-                const marker = L.marker([complaint.latitude, complaint.longitude], {
-                    icon: createCustomIcon(getStatusColor(complaint.status))
+            if (showHotspots) {
+                // Show heatmap
+                const points = complaints.map(c => [c.latitude, c.longitude, 1] as L.HeatLatLngTuple);
+                heatLayerRef.current = (L as any).heatLayer(points, { 
+                    radius: 25,
+                    blur: 15,
+                    maxZoom: 18,
+                    gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}
+                }).addTo(map);
+            } else {
+                // Show markers
+                complaints.forEach(complaint => {
+                    const marker = L.marker([complaint.latitude, complaint.longitude], {
+                        icon: createCustomIcon(getStatusColor(complaint.status))
+                    });
+                    marker.bindPopup(`<b>${complaint.category}</b><br />${complaint.description}`);
+                    marker.addTo(map);
+                    markersRef.current.push(marker);
                 });
-                marker.bindPopup(`<b>${complaint.category}</b><br />${complaint.description}`);
-                marker.addTo(map);
-            });
+            }
 
             // Fit map to bounds
             const bounds = L.latLngBounds(complaints.map(c => [c.latitude, c.longitude]));
@@ -107,7 +122,7 @@ export default function MapView({ complaints }: MapViewProps) {
             }
         }
 
-    }, [complaints]); // Re-run this effect when complaints change
+    }, [complaints, showHotspots]);
 
     if (typeof window === 'undefined') {
         return null;
