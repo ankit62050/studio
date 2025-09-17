@@ -8,7 +8,8 @@ import { Complaint } from '@/lib/types';
 
 // Default icon fix
 if (typeof window !== 'undefined') {
-    delete (L.Icon.Default.prototype as any)._getIconUrl;
+    // @ts-ignore
+    delete L.Icon.Default.prototype._getIconUrl;
     L.Icon.Default.mergeOptions({
         iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png').default.src,
         iconUrl: require('leaflet/dist/images/marker-icon.png').default.src,
