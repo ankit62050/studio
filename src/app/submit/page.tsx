@@ -34,7 +34,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { complaintCategories, ComplaintCategory, Complaint } from '@/lib/types';
-import { Camera, Loader2, Sparkles, MapPin, Mic, MicOff, Video } from 'lucide-react';
+import { Camera, Loader2, Sparkles, MapPin, Mic, MicOff, Video, X } from 'lucide-react';
 import Image from 'next/image';
 import { categorizeComplaintImage } from '@/ai/flows/categorize-complaint-image';
 import { useAuth } from '@/hooks/use-auth';
@@ -42,13 +42,15 @@ import { useComplaints } from '@/hooks/use-complaints';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { CameraCapture } from '@/components/camera-capture';
 
+const MAX_PHOTOS = 3;
+
 const formSchema = z.object({
   category: z.enum(complaintCategories, {
     required_error: 'Please select a category.',
   }),
   description: z.string().min(10, 'Description must be at least 10 characters.'),
   location: z.string().min(3, 'Location must be at least 3 characters.'),
-  photo: z.any().optional(),
+  photos: z.array(z.string()).min(1, `Please upload at least one photo.`).max(MAX_PHOTOS, `You can upload a maximum of ${MAX_PHOTOS} photos.`).optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
 });
@@ -60,7 +62,7 @@ export default function SubmitComplaintPage() {
   const { toast } = useToast();
   const { user } = useAuth();
   const { addComplaint } = useComplaints();
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCategorizing, setIsCategorizing] = useState(false);
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
@@ -75,13 +77,13 @@ export default function SubmitComplaintPage() {
     defaultValues: {
       description: '',
       location: '',
+      photos: [],
     },
   });
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      // API not supported, no need to proceed
       return;
     }
 
@@ -166,7 +168,6 @@ export default function SubmitComplaintPage() {
     if (isListening) return;
 
     try {
-        recognitionRef.current.lang = 'hi-IN';
         recognitionRef.current.start();
         toast({ title: 'Listening...' });
     } catch(e) {
@@ -192,25 +193,63 @@ export default function SubmitComplaintPage() {
     }
   };
 
-
   const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const photoDataUri = reader.result as string;
-        setPhotoPreview(photoDataUri);
-        form.setValue('photo', photoDataUri);
-        handleAiCategorize(photoDataUri);
-      };
-      reader.readAsDataURL(file);
+    const files = event.target.files;
+    if (files) {
+      const remainingSlots = MAX_PHOTOS - photoPreviews.length;
+      const filesToProcess = Array.from(files).slice(0, remainingSlots);
+
+      if (filesToProcess.length === 0) {
+        toast({
+          title: 'Maximum photos reached',
+          description: `You can only upload up to ${MAX_PHOTOS} photos.`,
+        });
+        return;
+      }
+      
+      filesToProcess.forEach(file => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const photoDataUri = reader.result as string;
+          setPhotoPreviews(prev => {
+            const newPreviews = [...prev, photoDataUri];
+            form.setValue('photos', newPreviews);
+            // Trigger AI categorization only for the first image.
+            if (newPreviews.length === 1) {
+              handleAiCategorize(photoDataUri);
+            }
+            return newPreviews;
+          });
+        };
+        reader.readAsDataURL(file);
+      });
     }
   };
+  
+  const handleRemovePhoto = (index: number) => {
+    setPhotoPreviews(prev => {
+        const newPreviews = prev.filter((_, i) => i !== index);
+        form.setValue('photos', newPreviews);
+        return newPreviews;
+    });
+  }
 
   const handleCapture = (photoDataUri: string) => {
-    setPhotoPreview(photoDataUri);
-    form.setValue('photo', photoDataUri);
-    handleAiCategorize(photoDataUri);
+    if (photoPreviews.length < MAX_PHOTOS) {
+      setPhotoPreviews(prev => {
+        const newPreviews = [...prev, photoDataUri];
+        form.setValue('photos', newPreviews);
+        if (newPreviews.length === 1) {
+          handleAiCategorize(photoDataUri);
+        }
+        return newPreviews;
+      });
+    } else {
+       toast({
+          title: 'Maximum photos reached',
+          description: `You cannot add more than ${MAX_PHOTOS} photos.`,
+       });
+    }
     setIsCameraDialogOpen(false);
   };
 
@@ -307,6 +346,15 @@ export default function SubmitComplaintPage() {
         });
         return;
     }
+    if(!data.photos || data.photos.length === 0) {
+       toast({
+            variant: 'destructive',
+            title: 'Photo Required',
+            description: 'Please upload at least one photo for the complaint.',
+        });
+        return;
+    }
+
     setIsSubmitting(true);
     
     const newComplaint: Complaint = {
@@ -319,7 +367,9 @@ export default function SubmitComplaintPage() {
         longitude: data.longitude,
         status: 'Received',
         submittedAt: new Date().toISOString(),
-        beforeImageUrl: data.photo,
+        beforeImageUrls: data.photos,
+        upvotedBy: [],
+        comments: [],
     };
 
     addComplaint(newComplaint);
@@ -347,7 +397,7 @@ export default function SubmitComplaintPage() {
         <CardHeader>
           <CardTitle>Complaint Details</CardTitle>
           <CardDescription>
-            Provide as much detail as possible. Uploading a photo is highly recommended.
+            Provide as much detail as possible. You can upload up to {MAX_PHOTOS} photos.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -355,43 +405,53 @@ export default function SubmitComplaintPage() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
                 control={form.control}
-                name="photo"
+                name="photos"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Photo</FormLabel>
-                    <FormControl>
-                      <div className="flex items-center gap-4">
-                        <div className="w-48 h-36 rounded-md border border-dashed flex items-center justify-center bg-muted/50">
-                          {photoPreview ? (
-                            <Image
-                              src={photoPreview}
-                              alt="Photo preview"
-                              width={192}
-                              height={144}
-                              className="object-cover rounded-md w-full h-full"
-                            />
-                          ) : (
-                            <Camera className="h-8 w-8 text-muted-foreground" />
-                          )}
+                    <FormLabel>Photos</FormLabel>
+                    <div className="flex flex-wrap items-start gap-4">
+                      {photoPreviews.map((preview, index) => (
+                        <div key={index} className="relative w-48 h-36">
+                          <Image
+                            src={preview}
+                            alt={`Photo preview ${index + 1}`}
+                            width={192}
+                            height={144}
+                            className="object-cover rounded-md w-full h-full"
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                            onClick={() => handleRemovePhoto(index)}
+                          >
+                            <X className="h-4 w-4" />
+                            <span className="sr-only">Remove photo</span>
+                          </Button>
                         </div>
-                        <div className="flex flex-col gap-2">
-                            <Input
+                      ))}
+                      {photoPreviews.length < MAX_PHOTOS && (
+                        <div className="w-48 h-36 rounded-md border border-dashed flex flex-col items-center justify-center bg-muted/50 p-2 gap-2">
+                           <Input
                                 type="file"
                                 accept="image/*"
+                                multiple
                                 className="hidden"
                                 id="photo-upload"
                                 onChange={handlePhotoChange}
+                                disabled={photoPreviews.length >= MAX_PHOTOS}
                             />
-                            <Button asChild type="button" variant="outline">
+                            <Button asChild type="button" variant="outline" size="sm" disabled={photoPreviews.length >= MAX_PHOTOS}>
                                 <label htmlFor="photo-upload" className="cursor-pointer">
                                     <Camera className="mr-2 h-4 w-4" />
-                                    {photoPreview ? 'Change Photo' : 'Upload File'}
+                                    Upload
                                 </label>
                             </Button>
                              <Dialog open={isCameraDialogOpen} onOpenChange={setIsCameraDialogOpen}>
                                 <DialogTrigger asChild>
-                                    <Button type="button" variant="outline">
-                                        <Video className="mr-2 h-4 w-4" /> Use Camera
+                                    <Button type="button" variant="outline" size="sm" disabled={photoPreviews.length >= MAX_PHOTOS}>
+                                        <Video className="mr-2 h-4 w-4" /> Camera
                                     </Button>
                                 </DialogTrigger>
                                 <DialogContent className="max-w-3xl">
@@ -401,11 +461,12 @@ export default function SubmitComplaintPage() {
                                     <CameraCapture onCapture={handleCapture} onClose={() => setIsCameraDialogOpen(false)}/>
                                 </DialogContent>
                             </Dialog>
+                             <p className="text-xs text-muted-foreground text-center">Add up to {MAX_PHOTOS} images</p>
                         </div>
-                      </div>
-                    </FormControl>
-                    <FormDescription>
-                      Upload a file or capture a photo of the issue. The AI will try to categorize it for you.
+                      )}
+                    </div>
+                     <FormDescription>
+                      The first image will be used by AI to suggest a category.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -439,7 +500,7 @@ export default function SubmitComplaintPage() {
                         ))}
                       </SelectContent>
                     </Select>
-                    {form.formState.isDirty && form.getValues('photo') && !isCategorizing && (
+                    {form.formState.isDirty && form.getValues('photos') && form.getValues('photos')!.length > 0 && !isCategorizing && (
                        <FormDescription className="flex items-center gap-2 text-green-600">
                           <Sparkles className="h-4 w-4" />
                           Category suggested by AI based on your image!

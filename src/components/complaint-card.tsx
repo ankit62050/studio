@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -59,7 +60,7 @@ export function ComplaintCard({ complaint }: { complaint: Complaint }) {
     setNewComment('');
   };
 
-  const images = [complaint.beforeImageUrl, ...complaint.progressImageUrls?.map(p => p.imageUrl) ?? [], complaint.afterImageUrl].filter(Boolean) as string[];
+  const images = [...(complaint.beforeImageUrls || []), ...complaint.progressImageUrls?.map(p => p.imageUrl) ?? [], complaint.afterImageUrl].filter(Boolean) as string[];
 
   const comments = complaint.comments || [];
   const upvotedBy = complaint.upvotedBy || [];

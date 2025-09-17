@@ -1,3 +1,4 @@
+
 export type User = {
   id: string;
   name: string;
@@ -49,11 +50,11 @@ export type Complaint = {
   status: ComplaintStatus;
   submittedAt: string;
   resolvedAt?: string;
-  beforeImageUrl?: string;
+  beforeImageUrls?: string[]; // Changed from beforeImageUrl
   afterImageUrl?: string;
   progressImageUrls?: { status: ComplaintStatus, imageUrl: string }[];
   feedback?: Feedback;
-  upvotedBy: string[]; // Changed from upvotes: number
+  upvotedBy: string[];
   comments: Comment[];
 };
 

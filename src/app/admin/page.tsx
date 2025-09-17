@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, useMemo } from 'react';
@@ -40,6 +41,7 @@ import {
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 type StatusFilter = ComplaintStatus | 'Pending' | 'All';
 
@@ -92,7 +94,7 @@ export default function AdminDashboardPage() {
         complaint: {
           description: complaint.description,
           location: complaint.location,
-          photoDataUri: complaint.beforeImageUrl,
+          photoDataUri: complaint.beforeImageUrls?.[0],
         },
         officers,
       });
@@ -332,6 +334,7 @@ export default function AdminDashboardPage() {
                 {filteredComplaints.map((complaint) => {
                   const user = getUserById(complaint.userId);
                   const isProcessing = processingComplaintId === complaint.id;
+                  const allImages = [...(complaint.beforeImageUrls || []), ...(complaint.progressImageUrls?.map(p => p.imageUrl) || []), ...(complaint.afterImageUrl ? [complaint.afterImageUrl] : [])];
                   return (
                     <TableRow key={complaint.id}>
                       <TableCell>
@@ -391,9 +394,9 @@ export default function AdminDashboardPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          {complaint.beforeImageUrl && (
+                           {complaint.beforeImageUrls && complaint.beforeImageUrls.length > 0 && (
                               <Image
-                                  src={complaint.beforeImageUrl}
+                                  src={complaint.beforeImageUrls[0]}
                                   alt="Complaint image"
                                   width={100}
                                   height={75}
@@ -451,8 +454,8 @@ export default function AdminDashboardPage() {
                     <div className="space-y-4">
                         <h4 className="font-semibold text-lg">Complaint</h4>
                         <p className="text-sm text-muted-foreground p-4 bg-muted/50 rounded-lg">{currentComplaintForDialog.description}</p>
-                         {currentComplaintForDialog.beforeImageUrl && (
-                           <Image src={currentComplaintForDialog.beforeImageUrl} alt="Complaint" width={300} height={225} className="rounded-lg object-cover" />
+                         {currentComplaintForDialog.beforeImageUrls && currentComplaintForDialog.beforeImageUrls[0] && (
+                           <Image src={currentComplaintForDialog.beforeImageUrls[0]} alt="Complaint" width={300} height={225} className="rounded-lg object-cover" />
                         )}
                     </div>
                     <div className="space-y-4">

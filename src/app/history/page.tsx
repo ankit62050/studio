@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, Suspense } from 'react';
@@ -31,6 +32,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 const getStatusColor = (status: ComplaintStatus) => {
   switch (status) {
@@ -207,11 +209,25 @@ function HistoryPageContent() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <p>{complaint.description}</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {complaint.beforeImageUrl && (
+                <div className="space-y-2">
+                    {complaint.beforeImageUrls && complaint.beforeImageUrls.length > 0 && (
                          <div>
                             <h4 className="font-semibold mb-2">Before</h4>
-                            <Image src={complaint.beforeImageUrl} alt="Before" width={600} height={400} className="rounded-lg object-cover" />
+                            <Carousel className="w-full max-w-lg mx-auto">
+                                <CarouselContent>
+                                    {complaint.beforeImageUrls.map((img, index) => (
+                                        <CarouselItem key={index}>
+                                            <Image src={img} alt={`Before image ${index + 1}`} width={600} height={400} className="rounded-lg object-cover aspect-video" />
+                                        </CarouselItem>
+                                    ))}
+                                </CarouselContent>
+                                {complaint.beforeImageUrls.length > 1 && (
+                                    <>
+                                        <CarouselPrevious className="left-2" />
+                                        <CarouselNext className="right-2" />
+                                    </>
+                                )}
+                            </Carousel>
                         </div>
                     )}
                     {complaint.afterImageUrl && (
