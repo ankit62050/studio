@@ -62,13 +62,18 @@ const chatFlow = ai.defineFlow(
     outputSchema: ChatOutputSchema,
   },
   async input => {
-    const llmResponse = await prompt(input);
-    const output = llmResponse.output;
+    try {
+      const llmResponse = await prompt(input);
+      const output = llmResponse.output;
 
-    if (!output) {
-      return {response: "I'm sorry, I couldn't generate a response. Please try again."};
+      if (!output) {
+        return {response: "I'm sorry, I couldn't generate a response. Please try again."};
+      }
+      
+      return { response: output.response };
+    } catch (error) {
+      console.error("Error in chatFlow:", error);
+      return { response: "I'm sorry, the service is currently busy. Please try again in a few moments." };
     }
-    
-    return { response: output.response };
   }
 );
