@@ -45,7 +45,6 @@ export function Chatbot() {
     recognitionRef.current = recognition;
     recognition.continuous = false;
     recognition.interimResults = true;
-    recognition.lang = 'hi-IN'; // Prioritize Hindi, but most browsers will auto-detect English
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       let interimTranscript = '';
