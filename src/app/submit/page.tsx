@@ -64,6 +64,8 @@ export default function SubmitComplaintPage() {
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
+  const silenceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -74,76 +76,115 @@ export default function SubmitComplaintPage() {
   });
 
   useEffect(() => {
-    // Check for SpeechRecognition API
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      recognitionRef.current = new SpeechRecognition();
-      const recognition = recognitionRef.current;
-      recognition.continuous = true;
-      recognition.interimResults = true;
-
-      recognition.onresult = (event: SpeechRecognitionEvent) => {
-        let interimTranscript = '';
-        let finalTranscript = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript;
-          } else {
-            interimTranscript += event.results[i][0].transcript;
-          }
-        }
-        const currentDescription = form.getValues('description');
-        form.setValue('description', currentDescription + finalTranscript);
-      };
-
-      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-        toast({
-            variant: 'destructive',
-            title: 'Speech Recognition Error',
-            description: `Error: ${event.error}`,
-        });
-        setIsListening(false);
-      };
-
-      recognition.onend = () => {
-        if(isListening) {
-          recognition.start();
-        }
-      };
-
-    } else {
-        toast({
-            variant: 'destructive',
-            title: 'Not Supported',
-            description: 'Your browser does not support voice recognition.',
-        });
+    if (!SpeechRecognition) {
+      // API not supported, no need to proceed
+      return;
     }
+
+    const recognition = new SpeechRecognition();
+    recognitionRef.current = recognition;
+    recognition.interimResults = true;
+
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
+      if (silenceTimeoutRef.current) {
+        clearTimeout(silenceTimeoutRef.current);
+      }
+      let finalTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        }
+      }
+      if (finalTranscript) {
+        const currentDescription = form.getValues('description');
+        form.setValue('description', (currentDescription ? currentDescription + ' ' : '') + finalTranscript.trim());
+      }
+    };
+    
+    recognition.onspeechstart = () => {
+      if (silenceTimeoutRef.current) {
+        clearTimeout(silenceTimeoutRef.current);
+      }
+    };
+
+    recognition.onspeechend = () => {
+      silenceTimeoutRef.current = setTimeout(() => {
+        stopListening();
+      }, 3000);
+    };
+
+    recognition.onstart = () => {
+      setIsListening(true);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+      if (silenceTimeoutRef.current) {
+        clearTimeout(silenceTimeoutRef.current);
+      }
+    };
+
+    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+      let errorMessage = `Error: ${event.error}`;
+      if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+        errorMessage = 'Microphone access denied. Please allow microphone access in your browser settings.';
+      } else if (event.error === 'no-speech') {
+        errorMessage = 'No speech was detected. Please try again.';
+      }
+      toast({
+          variant: 'destructive',
+          title: 'Speech Recognition Error',
+          description: errorMessage,
+      });
+      setIsListening(false);
+    };
 
     return () => {
       if (recognitionRef.current) {
         recognitionRef.current.stop();
       }
+      if (silenceTimeoutRef.current) {
+        clearTimeout(silenceTimeoutRef.current);
+      }
     };
-  }, [form, toast, isListening]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, toast]);
   
-  const toggleListening = () => {
-    if (!recognitionRef.current) return;
-
-    if (isListening) {
-      recognitionRef.current.stop();
-      setIsListening(false);
-    } else {
-      try {
-        recognitionRef.current.start();
-        setIsListening(true);
-      } catch(e) {
-        // May fail if permissions not granted
+  const startListening = () => {
+    if (!recognitionRef.current) {
         toast({
             variant: 'destructive',
-            title: 'Microphone Access Denied',
-            description: 'Please allow microphone access to use this feature.',
+            title: 'Not Supported',
+            description: 'Your browser does not support voice recognition.',
         });
-      }
+        return;
+    }
+    if (isListening) return;
+
+    try {
+        recognitionRef.current.start();
+        toast({ title: 'Listening...' });
+    } catch(e) {
+        toast({
+            variant: 'destructive',
+            title: 'Could not start listening',
+            description: 'Please ensure microphone permissions are enabled.',
+        });
+    }
+  };
+
+  const stopListening = () => {
+      if (!recognitionRef.current || !isListening) return;
+      recognitionRef.current.stop();
+      toast({ title: 'Stopped listening.' });
+  };
+  
+  const toggleListening = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
     }
   };
 
