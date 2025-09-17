@@ -34,11 +34,13 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { complaintCategories, ComplaintCategory, Complaint } from '@/lib/types';
-import { Camera, Loader2, Sparkles, MapPin, Mic, MicOff } from 'lucide-react';
+import { Camera, Loader2, Sparkles, MapPin, Mic, MicOff, Video } from 'lucide-react';
 import Image from 'next/image';
 import { categorizeComplaintImage } from '@/ai/flows/categorize-complaint-image';
 import { useAuth } from '@/hooks/use-auth';
 import { useComplaints } from '@/hooks/use-complaints';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { CameraCapture } from '@/components/camera-capture';
 
 const formSchema = z.object({
   category: z.enum(complaintCategories, {
@@ -63,6 +65,7 @@ export default function SubmitComplaintPage() {
   const [isCategorizing, setIsCategorizing] = useState(false);
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [isCameraDialogOpen, setIsCameraDialogOpen] = useState(false);
   const recognitionRef = useRef<any>(null);
   const silenceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -163,6 +166,7 @@ export default function SubmitComplaintPage() {
     if (isListening) return;
 
     try {
+        recognitionRef.current.lang = 'hi-IN';
         recognitionRef.current.start();
         toast({ title: 'Listening...' });
     } catch(e) {
@@ -194,13 +198,22 @@ export default function SubmitComplaintPage() {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPhotoPreview(reader.result as string);
-        form.setValue('photo', reader.result as string);
-        handleAiCategorize(reader.result as string);
+        const photoDataUri = reader.result as string;
+        setPhotoPreview(photoDataUri);
+        form.setValue('photo', photoDataUri);
+        handleAiCategorize(photoDataUri);
       };
       reader.readAsDataURL(file);
     }
   };
+
+  const handleCapture = (photoDataUri: string) => {
+    setPhotoPreview(photoDataUri);
+    form.setValue('photo', photoDataUri);
+    handleAiCategorize(photoDataUri);
+    setIsCameraDialogOpen(false);
+  };
+
 
   const handleAiCategorize = async (photoDataUri: string) => {
     setIsCategorizing(true);
@@ -361,22 +374,38 @@ export default function SubmitComplaintPage() {
                             <Camera className="h-8 w-8 text-muted-foreground" />
                           )}
                         </div>
-                        <Input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          id="photo-upload"
-                          onChange={handlePhotoChange}
-                        />
-                         <Button asChild type="button" variant="outline">
-                           <label htmlFor="photo-upload" className="cursor-pointer">
-                              {photoPreview ? 'Change Photo' : 'Upload Photo'}
-                           </label>
-                         </Button>
+                        <div className="flex flex-col gap-2">
+                            <Input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                id="photo-upload"
+                                onChange={handlePhotoChange}
+                            />
+                            <Button asChild type="button" variant="outline">
+                                <label htmlFor="photo-upload" className="cursor-pointer">
+                                    <Camera className="mr-2 h-4 w-4" />
+                                    {photoPreview ? 'Change Photo' : 'Upload File'}
+                                </label>
+                            </Button>
+                             <Dialog open={isCameraDialogOpen} onOpenChange={setIsCameraDialogOpen}>
+                                <DialogTrigger asChild>
+                                    <Button type="button" variant="outline">
+                                        <Video className="mr-2 h-4 w-4" /> Use Camera
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-3xl">
+                                    <DialogHeader>
+                                        <DialogTitle>Capture Photo</DialogTitle>
+                                    </DialogHeader>
+                                    <CameraCapture onCapture={handleCapture} onClose={() => setIsCameraDialogOpen(false)}/>
+                                </DialogContent>
+                            </Dialog>
+                        </div>
                       </div>
                     </FormControl>
                     <FormDescription>
-                      Upload a photo of the issue. The AI will try to categorize it for you.
+                      Upload a file or capture a photo of the issue. The AI will try to categorize it for you.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
