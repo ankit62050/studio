@@ -21,6 +21,7 @@ export function CameraCapture({ onCapture, onClose }: CameraCaptureProps) {
   const { toast } = useToast();
 
   useEffect(() => {
+    let stream: MediaStream | null = null;
     const getCameraPermission = async () => {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         toast({
@@ -33,7 +34,7 @@ export function CameraCapture({ onCapture, onClose }: CameraCaptureProps) {
       }
 
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
         setHasCameraPermission(true);
 
         if (videoRef.current) {
@@ -54,8 +55,7 @@ export function CameraCapture({ onCapture, onClose }: CameraCaptureProps) {
 
     return () => {
       // Stop the video stream when the component unmounts
-      if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
+      if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
     };
