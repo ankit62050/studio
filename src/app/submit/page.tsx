@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -34,7 +34,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { complaintCategories, ComplaintCategory, Complaint } from '@/lib/types';
-import { Camera, Loader2, Sparkles, MapPin } from 'lucide-react';
+import { Camera, Loader2, Sparkles, MapPin, Mic, MicOff } from 'lucide-react';
 import Image from 'next/image';
 import { categorizeComplaintImage } from '@/ai/flows/categorize-complaint-image';
 import { useAuth } from '@/hooks/use-auth';
@@ -62,6 +62,8 @@ export default function SubmitComplaintPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCategorizing, setIsCategorizing] = useState(false);
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -70,6 +72,81 @@ export default function SubmitComplaintPage() {
       location: '',
     },
   });
+
+  useEffect(() => {
+    // Check for SpeechRecognition API
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      recognitionRef.current = new SpeechRecognition();
+      const recognition = recognitionRef.current;
+      recognition.continuous = true;
+      recognition.interimResults = true;
+
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
+        }
+        const currentDescription = form.getValues('description');
+        form.setValue('description', currentDescription + finalTranscript);
+      };
+
+      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+        toast({
+            variant: 'destructive',
+            title: 'Speech Recognition Error',
+            description: `Error: ${event.error}`,
+        });
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        if(isListening) {
+          recognition.start();
+        }
+      };
+
+    } else {
+        toast({
+            variant: 'destructive',
+            title: 'Not Supported',
+            description: 'Your browser does not support voice recognition.',
+        });
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, [form, toast, isListening]);
+  
+  const toggleListening = () => {
+    if (!recognitionRef.current) return;
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      try {
+        recognitionRef.current.start();
+        setIsListening(true);
+      } catch(e) {
+        // May fail if permissions not granted
+        toast({
+            variant: 'destructive',
+            title: 'Microphone Access Denied',
+            description: 'Please allow microphone access to use this feature.',
+        });
+      }
+    }
+  };
+
 
   const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -308,13 +385,22 @@ export default function SubmitComplaintPage() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Description</FormLabel>
+                      <Button type="button" variant={isListening ? 'destructive' : 'outline'} size="icon" onClick={toggleListening} className="h-8 w-8">
+                          {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                          <span className="sr-only">{isListening ? 'Stop Listening' : 'Start Listening'}</span>
+                      </Button>
+                    </div>
                     <FormControl>
                       <Textarea
                         placeholder="e.g., Overflowing dustbin on the corner..."
                         {...field}
                       />
                     </FormControl>
+                    <FormDescription>
+                      {isListening ? 'Listening... Speak now.' : 'You can use the microphone to dictate the description.'}
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
