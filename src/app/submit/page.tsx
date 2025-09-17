@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -33,7 +34,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { complaintCategories, ComplaintCategory, Complaint } from '@/lib/types';
-import { Camera, Loader2, Sparkles } from 'lucide-react';
+import { Camera, Loader2, Sparkles, MapPin } from 'lucide-react';
 import Image from 'next/image';
 import { categorizeComplaintImage } from '@/ai/flows/categorize-complaint-image';
 import { useAuth } from '@/hooks/use-auth';
@@ -46,6 +47,8 @@ const formSchema = z.object({
   description: z.string().min(10, 'Description must be at least 10 characters.'),
   location: z.string().min(3, 'Location must be at least 3 characters.'),
   photo: z.any().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -58,6 +61,7 @@ export default function SubmitComplaintPage() {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCategorizing, setIsCategorizing] = useState(false);
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -103,6 +107,66 @@ export default function SubmitComplaintPage() {
     }
   };
 
+  const handleDetectLocation = () => {
+    if (!navigator.geolocation) {
+        toast({
+            variant: 'destructive',
+            title: 'Geolocation Not Supported',
+            description: 'Your browser does not support location detection.',
+        });
+        return;
+    }
+
+    setIsDetectingLocation(true);
+
+    navigator.geolocation.getCurrentPosition(
+        async (position) => {
+            const { latitude, longitude } = position.coords;
+            form.setValue('latitude', latitude);
+            form.setValue('longitude', longitude);
+
+            try {
+                // Using OpenStreetMap's free Nominatim reverse geocoding API
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+                const data = await response.json();
+                
+                if (data && data.display_name) {
+                    form.setValue('location', data.display_name);
+                     toast({
+                        title: 'Location Detected!',
+                        description: 'Your location has been filled in.',
+                    });
+                } else {
+                    form.setValue('location', `Lat: ${latitude.toFixed(5)}, Lon: ${longitude.toFixed(5)}`);
+                }
+            } catch (error) {
+                 toast({
+                    variant: 'destructive',
+                    title: 'Could Not Fetch Address',
+                    description: 'Location coordinates found, but failed to fetch address.',
+                });
+                form.setValue('location', `Lat: ${latitude.toFixed(5)}, Lon: ${longitude.toFixed(5)}`);
+            } finally {
+                setIsDetectingLocation(false);
+            }
+        },
+        (error) => {
+            let description = 'An unknown error occurred.';
+            if (error.code === error.PERMISSION_DENIED) {
+                description = 'Please allow location access in your browser settings.';
+            } else if (error.code === error.POSITION_UNAVAILABLE) {
+                description = 'Location information is unavailable.';
+            }
+            toast({
+                variant: 'destructive',
+                title: 'Location Detection Failed',
+                description: description,
+            });
+            setIsDetectingLocation(false);
+        }
+    );
+  };
+
   const onSubmit = (data: FormValues) => {
     if (!user) {
         toast({
@@ -120,6 +184,8 @@ export default function SubmitComplaintPage() {
         category: data.category,
         description: data.description,
         location: data.location,
+        latitude: data.latitude,
+        longitude: data.longitude,
         status: 'Received',
         submittedAt: new Date().toISOString(),
         beforeImageUrl: data.photo,
@@ -260,12 +326,21 @@ export default function SubmitComplaintPage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Location / Address</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="e.g., Main St & 1st Ave"
-                        {...field}
-                      />
-                    </FormControl>
+                    <div className="flex gap-2">
+                        <FormControl>
+                        <Input
+                            placeholder="e.g., Main St & 1st Ave"
+                            {...field}
+                        />
+                        </FormControl>
+                        <Button type="button" variant="outline" size="icon" onClick={handleDetectLocation} disabled={isDetectingLocation}>
+                            {isDetectingLocation ? <Loader2 className="h-4 w-4 animate-spin" /> : <MapPin className="h-4 w-4" />}
+                            <span className="sr-only">Detect Location</span>
+                        </Button>
+                    </div>
+                     <FormDescription>
+                      You can enter the address manually or use the button to detect your current location.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
