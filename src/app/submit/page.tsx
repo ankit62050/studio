@@ -85,8 +85,7 @@ export default function SubmitComplaintPage() {
     const recognition = new SpeechRecognition();
     recognitionRef.current = recognition;
     recognition.interimResults = true;
-    recognition.lang = 'hi-IN';
-
+    
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       if (silenceTimeoutRef.current) {
         clearTimeout(silenceTimeoutRef.current);
