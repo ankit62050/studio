@@ -320,12 +320,12 @@ export default function AdminDashboardPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>User</TableHead>
-                  <TableHead>Category</TableHead>
+                  <TableHead className="hidden sm:table-cell">Category</TableHead>
                   <TableHead>Description</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Submitted</TableHead>
+                  <TableHead className="hidden md:table-cell">Location</TableHead>
+                  <TableHead className="hidden lg:table-cell">Submitted</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Feedback</TableHead>
+                  <TableHead className="hidden sm:table-cell">Feedback</TableHead>
                   <TableHead>Images</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
@@ -339,14 +339,14 @@ export default function AdminDashboardPage() {
                     <TableRow key={complaint.id}>
                       <TableCell>
                           <div className="font-medium">{user?.name}</div>
-                          <div className="text-sm text-muted-foreground">{user?.email}</div>
+                          <div className="text-sm text-muted-foreground hidden sm:block">{user?.email}</div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="hidden sm:table-cell">
                         <Badge variant="secondary">{complaint.category}</Badge>
                       </TableCell>
-                       <TableCell className="max-w-xs truncate">{complaint.description}</TableCell>
-                      <TableCell>{complaint.location}</TableCell>
-                      <TableCell>
+                       <TableCell className="max-w-[200px] sm:max-w-xs truncate">{complaint.description}</TableCell>
+                      <TableCell className="hidden md:table-cell">{complaint.location}</TableCell>
+                      <TableCell className="hidden lg:table-cell">
                         {format(new Date(complaint.submittedAt), 'PPp')}
                       </TableCell>
                       <TableCell>
@@ -356,7 +356,7 @@ export default function AdminDashboardPage() {
                             handleStatusChange(complaint.id, value)
                           }
                         >
-                          <SelectTrigger className="w-[180px]">
+                          <SelectTrigger className="w-[160px]">
                             <SelectValue placeholder="Set status" />
                           </SelectTrigger>
                           <SelectContent>
@@ -368,7 +368,7 @@ export default function AdminDashboardPage() {
                           </SelectContent>
                         </Select>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="hidden sm:table-cell">
                         {complaint.feedback ? (
                           <Popover>
                             <PopoverTrigger asChild>
@@ -393,28 +393,39 @@ export default function AdminDashboardPage() {
                         )}
                       </TableCell>
                       <TableCell>
-                        <div className="flex gap-2">
-                           {complaint.beforeImageUrls && complaint.beforeImageUrls.length > 0 && (
-                              <Image
-                                  src={complaint.beforeImageUrls[0]}
-                                  alt="Complaint image"
-                                  width={100}
-                                  height={75}
-                                  className="rounded-md object-cover"
-                              />
-                          )}
-                          {complaint.afterImageUrl && (
-                              <Image
-                                  src={complaint.afterImageUrl}
-                                  alt="Resolved image"
-                                  width={100}
-                                  height={75}
-                                  className="rounded-md object-cover"
-                              />
-                          )}
-                        </div>
+                        {allImages.length > 0 && (
+                           <Popover>
+                             <PopoverTrigger asChild>
+                               <Button variant="outline" size="sm" className="flex items-center gap-2">
+                                 <Camera className="h-4 w-4" />
+                                 <span>{allImages.length}</span>
+                               </Button>
+                             </PopoverTrigger>
+                             <PopoverContent className="w-96">
+                              <Carousel>
+                                <CarouselContent>
+                                  {allImages.map((img, index) => (
+                                    <CarouselItem key={index}>
+                                      <Image
+                                        src={img}
+                                        alt={`Complaint image ${index+1}`}
+                                        width={400}
+                                        height={300}
+                                        className="rounded-md object-cover aspect-video"
+                                      />
+                                    </CarouselItem>
+                                  ))}
+                                </CarouselContent>
+                                {allImages.length > 1 && <>
+                                  <CarouselPrevious />
+                                  <CarouselNext />
+                                </>}
+                              </Carousel>
+                             </PopoverContent>
+                           </Popover>
+                        )}
                       </TableCell>
-                      <TableCell className="space-y-2">
+                      <TableCell className="space-y-2 flex flex-col items-start">
                           {complaint.status === 'Received' && (
                             <Button variant="outline" size="sm" onClick={() => handleProcessComplaint(complaint)} disabled={isProcessing}>
                               {isProcessing ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Sparkles className="mr-2 h-4 w-4"/>}
@@ -423,12 +434,12 @@ export default function AdminDashboardPage() {
                           )}
                           {complaint.status === 'Work in Progress' && (
                               <Button variant="outline" size="sm" onClick={() => handleAddPhotoClick(complaint.id, 'Work in Progress')}>
-                                  <Camera className="mr-2 h-4 w-4"/> Add Progress Photo
+                                  <Camera className="mr-2 h-4 w-4"/> Add Photo
                               </Button>
                           )}
                           {complaint.status === 'Resolved' && !complaint.afterImageUrl && (
                               <Button variant="outline" size="sm" onClick={() => handleAddPhotoClick(complaint.id, 'Resolved')}>
-                                  <Camera className="mr-2 h-4 w-4"/> Add After Photo
+                                  <Camera className="mr-2 h-4 w-4"/> Add Photo
                               </Button>
                           )}
                       </TableCell>
@@ -483,3 +494,5 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
+
+    
