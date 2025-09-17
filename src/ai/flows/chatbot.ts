@@ -33,6 +33,8 @@ const prompt = ai.definePrompt({
   output: {schema: ChatOutputSchema},
   prompt: `You are a friendly and helpful AI assistant for an app called JANConnect Lite. Your purpose is to answer user questions about the app and how to use it.
 
+  **IMPORTANT**: First, detect the language of the user's last query. It will be either English or Hindi. You MUST respond in the same language.
+
   Keep your answers concise and easy to understand.
 
   Here are some facts about the app:
@@ -50,7 +52,7 @@ const prompt = ai.definePrompt({
   {{role}}: {{{content}}}
   {{/each}}
   
-  Now, answer the latest user query.`,
+  Now, answer the latest user query in the detected language.`,
 });
 
 const chatFlow = ai.defineFlow(
