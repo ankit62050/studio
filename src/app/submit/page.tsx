@@ -80,6 +80,14 @@ export default function SubmitComplaintPage() {
       photos: [],
     },
   });
+  
+  useEffect(() => {
+    form.setValue('photos', photoPreviews);
+    if (photoPreviews.length === 1) {
+        handleAiCategorize(photoPreviews[0]);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [photoPreviews]);
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -211,15 +219,7 @@ export default function SubmitComplaintPage() {
         const reader = new FileReader();
         reader.onloadend = () => {
           const photoDataUri = reader.result as string;
-          setPhotoPreviews(prev => {
-            const newPreviews = [...prev, photoDataUri];
-            form.setValue('photos', newPreviews);
-            // Trigger AI categorization only for the first image.
-            if (newPreviews.length === 1) {
-              handleAiCategorize(photoDataUri);
-            }
-            return newPreviews;
-          });
+          setPhotoPreviews(prev => [...prev, photoDataUri]);
         };
         reader.readAsDataURL(file);
       });
@@ -227,23 +227,12 @@ export default function SubmitComplaintPage() {
   };
   
   const handleRemovePhoto = (index: number) => {
-    setPhotoPreviews(prev => {
-        const newPreviews = prev.filter((_, i) => i !== index);
-        form.setValue('photos', newPreviews);
-        return newPreviews;
-    });
+    setPhotoPreviews(prev => prev.filter((_, i) => i !== index));
   }
 
   const handleCapture = (photoDataUri: string) => {
     if (photoPreviews.length < MAX_PHOTOS) {
-      setPhotoPreviews(prev => {
-        const newPreviews = [...prev, photoDataUri];
-        form.setValue('photos', newPreviews);
-        if (newPreviews.length === 1) {
-          handleAiCategorize(photoDataUri);
-        }
-        return newPreviews;
-      });
+        setPhotoPreviews(prev => [...prev, photoDataUri]);
     } else {
        toast({
           title: 'Maximum photos reached',
