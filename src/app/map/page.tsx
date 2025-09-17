@@ -5,18 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useComplaints } from '@/hooks/use-complaints';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
-import dynamic from 'next/dynamic';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { complaintCategories, ComplaintCategory } from '@/lib/types';
+import { complaintCategories, ComplaintCategory, Complaint } from '@/lib/types';
+import { Map } from '@/components/map';
 
-
-const MapView = dynamic(() => import('@/components/map-view'), { 
-  ssr: false,
-  loading: () => <Skeleton className="h-full w-full" />
-});
 
 export default function CitizenMapPage() {
   const { complaints } = useComplaints();
@@ -26,7 +20,7 @@ export default function CitizenMapPage() {
   const filteredComplaints = useMemo(() => {
     return complaints
       .filter(c => c.latitude && c.longitude)
-      .filter(c => categoryFilter === 'All' || c.category === categoryFilter);
+      .filter(c => categoryFilter === 'All' || c.category === categoryFilter) as (Complaint & {latitude: number, longitude: number})[];
   }, [complaints, categoryFilter]);
 
   return (
@@ -69,7 +63,7 @@ export default function CitizenMapPage() {
             </Alert>
         </CardHeader>
         <CardContent className="p-2 h-full flex-grow">
-            <MapView complaints={filteredComplaints} showHotspots={showHotspots} />
+            <Map complaints={filteredComplaints} showHotspots={showHotspots} />
         </CardContent>
       </Card>
     </div>

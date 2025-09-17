@@ -6,16 +6,11 @@ import { FileText, Hourglass, CheckCircle, BarChart, AlertTriangle } from 'lucid
 import { ComplaintStatus, complaintStatuses, ComplaintCategory, complaintCategories } from '@/lib/types';
 import { useComplaints } from '@/hooks/use-complaints';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import dynamic from 'next/dynamic';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-
-const MapView = dynamic(() => import('@/components/map-view'), { 
-  ssr: false,
-  loading: () => <Skeleton className="h-full w-full" />
-});
+import { Map } from '@/components/map';
+import { Complaint } from '@/lib/types';
 
 export default function AdminMapPage() {
   const { complaints } = useComplaints();
@@ -34,7 +29,7 @@ export default function AdminMapPage() {
   const filteredComplaints = useMemo(() => {
     return complaints
       .filter(c => c.latitude && c.longitude)
-      .filter(c => categoryFilter === 'All' || c.category === categoryFilter);
+      .filter(c => categoryFilter === 'All' || c.category === categoryFilter) as (Complaint & {latitude: number, longitude: number})[];
   }, [complaints, categoryFilter]);
   
   return (
@@ -116,7 +111,7 @@ export default function AdminMapPage() {
             </Alert>
         </CardHeader>
         <CardContent className="p-2 h-[60vh]">
-           <MapView complaints={filteredComplaints} showHotspots={showHotspots} />
+           <Map complaints={filteredComplaints} showHotspots={showHotspots} />
         </CardContent>
       </Card>
     </div>
