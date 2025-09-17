@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -45,6 +46,7 @@ export function Chatbot() {
     recognitionRef.current = recognition;
     recognition.continuous = false;
     recognition.interimResults = true;
+    recognition.lang = 'hi-IN';
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       let interimTranscript = '';
