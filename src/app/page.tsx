@@ -1,9 +1,8 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { useMemo } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { ComplaintCard } from '@/components/complaint-card';
 import { useAuth } from '@/hooks/use-auth';
 import { useComplaints } from '@/hooks/use-complaints';
@@ -11,6 +10,8 @@ import { FileText, Hourglass, CheckCircle, ArrowRight } from 'lucide-react';
 import { ComplaintStatus, complaintStatuses } from '@/lib/types';
 import Link from 'next/link';
 import { useLanguage } from '@/hooks/use-language';
+import { Hero } from "@/components/ui/hero"
+import { Button } from '@/components/ui/button';
 
 const content = {
     en: {
@@ -30,6 +31,7 @@ const content = {
         recentComplaints: 'My Recent Complaints',
         noComplaints: 'You have not submitted any complaints yet.',
         viewAll: 'View All',
+        login: 'Get Started',
     },
     hi: {
         dashboardTitle: 'नागरिक डैशबोर्ड',
@@ -48,12 +50,13 @@ const content = {
         recentComplaints: 'मेरी हाल की शिकायतें',
         noComplaints: 'आपने अभी तक कोई शिकायत दर्ज नहीं की है।',
         viewAll: 'सभी देखें',
+        login: 'शुरू हो जाओ',
     }
 }
 
 
 export default function DashboardPage() {
-    const { user } = useAuth();
+    const { user, login } = useAuth();
     const { complaints } = useComplaints();
     const { language } = useLanguage();
     const pageContent = content[language];
@@ -83,7 +86,31 @@ export default function DashboardPage() {
     }, [userComplaints]);
 
     if (!user) {
-        return null; // Or a loading spinner
+        return (
+            <main className="min-h-screen flex flex-col bg-[#f3f1ea] -mt-8 -mx-8">
+              <Hero
+                eyebrow="JANCONNECT LITE"
+                title={
+                  <>
+                    <div className="whitespace-nowrap">
+                      <span className="font-instrument-serif font-normal">Your Voice, </span>
+                      <span className="font-instrument-serif font-normal italic">Seamlessly </span>
+                      <span className="font-instrument-serif font-normal">Heard</span>
+                    </div>
+                  </>
+                }
+                subtitle="JANConnect Lite brings your community's needs and local governance together."
+                ctaText={pageContent.login}
+                ctaLink="#"
+                mockupImage={{
+                  src: "https://picsum.photos/seed/notion-calendar/1274/1043",
+                  alt: "App interface mockup",
+                  width: 1274,
+                  height: 1043
+                }}
+              />
+            </main>
+          )
     }
 
     return (

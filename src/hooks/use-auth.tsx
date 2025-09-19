@@ -14,20 +14,17 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Default to the first citizen user for a logged-out experience
-const defaultUser = mockUsers.find(u => u.role === 'citizen')!;
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AppUser | null>(defaultUser);
+  const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(false);
 
   const login = useCallback((role: 'citizen' | 'admin' = 'citizen') => {
     const userToLogin = mockUsers.find(u => u.role === role);
-    setUser(userToLogin || defaultUser);
+    setUser(userToLogin || null);
   }, []);
 
   const logout = useCallback(() => {
-    setUser(defaultUser);
+    setUser(null);
   }, []);
 
   const value = useMemo(() => ({

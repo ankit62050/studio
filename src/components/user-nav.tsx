@@ -43,11 +43,11 @@ export function UserNav() {
   const navContent = content[language];
 
   if (!user) {
-    // This part of the code will not be reached due to the simplified auth hook
     return (
       <div className="flex items-center gap-2">
         <LanguageToggle />
-        <Button onClick={() => login('citizen')}>Login</Button>
+        <Button onClick={() => login('citizen')}>{navContent.login}</Button>
+        <Button variant="outline" onClick={() => login('citizen')}>{navContent.signUp}</Button>
       </div>
     );
   }
