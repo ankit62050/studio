@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useMemo, Suspense } from 'react';
+import { useState, useMemo, Suspense, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -114,13 +114,12 @@ function HistoryPageContent() {
   type FilterStatus = 'all' | 'pending' | 'resolved';
   const [filter, setFilter] = useState<FilterStatus>(initialStatus as FilterStatus);
 
-  if (!user) return null;
-
   const userComplaints = useMemo(() => {
+    if (!user) return [];
     return complaints
       .filter((c) => c.userId === user.id)
       .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
-  }, [complaints, user.id]);
+  }, [complaints, user]);
 
   const filteredComplaints = useMemo(() => {
     if (filter === 'all') {
@@ -135,13 +134,16 @@ function HistoryPageContent() {
     return userComplaints;
   }, [userComplaints, filter]);
 
-  const handleDelete = (complaintId: string) => {
+  const handleDelete = useCallback((complaintId: string) => {
     deleteComplaint(complaintId);
     toast({
         title: 'Complaint Deleted',
         description: 'Your complaint has been successfully removed.',
     });
-  }
+  }, [deleteComplaint, toast]);
+
+  if (!user) return null;
+
 
   return (
     <div className="space-y-8">
