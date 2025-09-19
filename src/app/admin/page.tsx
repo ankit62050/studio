@@ -24,7 +24,7 @@ import { users, officers } from '@/lib/data';
 import { format, subDays, startOfDay } from 'date-fns';
 import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { BarChart, FileText, Hourglass, CheckCircle, Camera, Star, Sparkles, Loader2, User as UserIcon, Building, Shield, Layers } from 'lucide-react';
+import { FileText, Hourglass, CheckCircle, Camera, Star, Sparkles, Loader2, User as UserIcon, Building, Shield, Layers, Workflow, List } from 'lucide-react';
 import Image from 'next/image';
 import { useComplaints } from '@/hooks/use-complaints';
 import { Button } from '@/components/ui/button';
@@ -40,8 +40,8 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { ExpandableTabs } from '@/components/ui/expandable-tabs';
 
 type StatusFilter = ComplaintStatus | 'Pending' | 'All';
 
@@ -56,6 +56,8 @@ export default function AdminDashboardPage() {
   const [isSuggestionDialogOpen, setIsSuggestionDialogOpen] = useState(false);
   const [currentComplaintIdForDialog, setCurrentComplaintIdForDialog] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<StatusFilter>('All');
+  const [selectedTabIndex, setSelectedTabIndex] = useState<number | null>(0);
+
 
   const handleStatusChange = (complaintId: string, newStatus: ComplaintStatus) => {
     updateComplaintStatus(complaintId, newStatus);
@@ -127,14 +129,6 @@ export default function AdminDashboardPage() {
     setCurrentComplaintIdForDialog(null);
   };
 
-
-  const statusCounts = useMemo(() => complaintStatuses.reduce((acc, status) => {
-    acc[status] = complaints.filter(c => c.status === status).length;
-    return acc;
-  }, {} as Record<ComplaintStatus, number>), [complaints]);
-
-  const pendingCount = statusCounts['Received'] + statusCounts['Under Review'];
-
   const filteredComplaints = useMemo(() => {
     if (activeFilter === 'All') return complaints;
     if (activeFilter === 'Pending') {
@@ -191,50 +185,38 @@ export default function AdminDashboardPage() {
     },
   };
 
+  const filterTabs = useMemo(() => {
+    const statusCounts = complaintStatuses.reduce((acc, status) => {
+        acc[status] = complaints.filter(c => c.status === status).length;
+        return acc;
+    }, {} as Record<ComplaintStatus, number>);
+    const pendingCount = statusCounts['Received'] + statusCounts['Under Review'];
+
+    return [
+      { title: `All (${complaints.length})`, icon: List, filter: 'All' },
+      { title: `Pending (${pendingCount})`, icon: Hourglass, filter: 'Pending' },
+      { title: `In Progress (${statusCounts['Work in Progress']})`, icon: Workflow, filter: 'Work in Progress' },
+      { title: `Resolved (${statusCounts['Resolved']})`, icon: CheckCircle, filter: 'Resolved' },
+    ];
+  }, [complaints]);
+  
+  const handleFilterChange = (index: number | null) => {
+    setSelectedTabIndex(index);
+    if (index === null) {
+      setActiveFilter('All');
+      return;
+    }
+    setActiveFilter(filterTabs[index].filter as StatusFilter);
+  };
+
   return (
     <div className="space-y-8">
-       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
-        <p className="text-muted-foreground">Overview of all citizen complaints and trends.</p>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card onClick={() => setActiveFilter('All')} className={cn("cursor-pointer transition-shadow hover:shadow-md", activeFilter === 'All' && "ring-2 ring-primary")}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Complaints</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{complaints.length}</div>
-          </CardContent>
-        </Card>
-        <Card onClick={() => setActiveFilter('Pending')} className={cn("cursor-pointer transition-shadow hover:shadow-md", activeFilter === 'Pending' && "ring-2 ring-primary")}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending</CardTitle>
-            <Hourglass className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">{pendingCount}</div>
-          </CardContent>
-        </Card>
-        <Card onClick={() => setActiveFilter('Work in Progress')} className={cn("cursor-pointer transition-shadow hover:shadow-md", activeFilter === 'Work in Progress' && "ring-2 ring-primary")}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Work in Progress</CardTitle>
-            <BarChart className="h-4 w-4 text-info" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-info">{statusCounts['Work in Progress']}</div>
-          </CardContent>
-        </Card>
-        <Card onClick={() => setActiveFilter('Resolved')} className={cn("cursor-pointer transition-shadow hover:shadow-md", activeFilter === 'Resolved' && "ring-2 ring-primary")}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Resolved</CardTitle>
-            <CheckCircle className="h-4 w-4 text-accent" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-accent">{statusCounts['Resolved']}</div>
-          </CardContent>
-        </Card>
+       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
+          <p className="text-muted-foreground">Overview of all citizen complaints and trends.</p>
+        </div>
+        <ExpandableTabs tabs={filterTabs} onChange={handleFilterChange} />
       </div>
 
        <div className="space-y-4">
