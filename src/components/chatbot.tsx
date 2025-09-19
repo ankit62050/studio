@@ -18,6 +18,34 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { cn } from '@/lib/utils';
 import { chat } from '@/ai/flows/chatbot';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/hooks/use-language';
+
+const content = {
+  en: {
+    title: "JANConnect Lite Helper",
+    description: "Ask me any questions about using the app.",
+    initialMessage: "Hello! How can I assist you with the JANConnect Lite app today?",
+    inputPlaceholder: "Type or speak your message...",
+    listeningToast: "Listening...",
+    errorTitle: "Speech Recognition Error",
+    deniedError: "Microphone access denied. Please allow it in your browser settings.",
+    noSpeechError: "No speech was detected. Please try again.",
+    notSupportedError: "Your browser does not support voice recognition.",
+    startListenError: "Could not start listening. Please ensure microphone permissions are enabled."
+  },
+  hi: {
+    title: "जन कनेक्ट लाइट हेल्पर",
+    description: "ऐप का उपयोग करने के बारे में मुझसे कोई भी प्रश्न पूछें।",
+    initialMessage: "नमस्ते! मैं आज जन कनेक्ट लाइट ऐप में आपकी कैसे सहायता कर सकता हूँ?",
+    inputPlaceholder: "अपना संदेश टाइप करें या बोलें...",
+    listeningToast: "सुन रहा हूँ...",
+    errorTitle: "वाक् पहचान त्रुटि",
+    deniedError: "माइक्रोफ़ोन एक्सेस अस्वीकृत। कृपया अपनी ब्राउज़र सेटिंग्स में इसे अनुमति दें।",
+    noSpeechError: "कोई भाषण नहीं मिला। कृपया पुनः प्रयास करें।",
+    notSupportedError: "आपका ब्राउज़र वाक् पहचान का समर्थन नहीं करता है।",
+    startListenError: "सुनना शुरू नहीं हो सका। कृपया सुनिश्चित करें कि माइक्रोफ़ोन की अनुमति सक्षम है।"
+  }
+}
 
 type Message = {
   role: 'user' | 'model';
@@ -25,6 +53,8 @@ type Message = {
 };
 
 export function Chatbot() {
+  const { language } = useLanguage();
+  const pageContent = content[language];
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -46,6 +76,7 @@ export function Chatbot() {
     recognitionRef.current = recognition;
     recognition.continuous = false;
     recognition.interimResults = true;
+    recognition.lang = language === 'hi' ? 'hi-IN' : 'en-US';
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       let interimTranscript = '';
@@ -72,13 +103,13 @@ export function Chatbot() {
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
       let errorMessage = `Error: ${event.error}`;
       if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-        errorMessage = 'Microphone access denied. Please allow it in your browser settings.';
+        errorMessage = pageContent.deniedError;
       } else if (event.error === 'no-speech') {
-        errorMessage = 'No speech was detected. Please try again.';
+        errorMessage = pageContent.noSpeechError;
       }
       toast({
           variant: 'destructive',
-          title: 'Speech Recognition Error',
+          title: pageContent.errorTitle,
           description: errorMessage,
       });
       setIsListening(false);
@@ -90,14 +121,14 @@ export function Chatbot() {
       }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [toast]);
+  }, [language, toast]);
 
   const toggleListening = () => {
     if (!recognitionRef.current) {
         toast({
             variant: 'destructive',
             title: 'Not Supported',
-            description: 'Your browser does not support voice recognition.',
+            description: pageContent.notSupportedError,
         });
         return;
     }
@@ -108,12 +139,12 @@ export function Chatbot() {
       setInput(''); // Clear input before starting
       try {
         recognitionRef.current.start();
-        toast({ title: 'Listening...' });
+        toast({ title: pageContent.listeningToast });
       } catch(e) {
         toast({
             variant: 'destructive',
             title: 'Could not start listening',
-            description: 'Please ensure microphone permissions are enabled.',
+            description: pageContent.startListenError,
         });
       }
     }
@@ -162,10 +193,10 @@ export function Chatbot() {
         <DialogContent className="sm:max-w-[425px] grid-rows-[auto_1fr_auto] p-0 max-h-[90vh]">
           <DialogHeader className="p-6 pb-4">
             <DialogTitle className="flex items-center gap-2">
-              <Bot /> JANConnect Lite Helper
+              <Bot /> {pageContent.title}
             </DialogTitle>
             <DialogDescription>
-              Ask me any questions about using the app.
+              {pageContent.description}
             </DialogDescription>
           </DialogHeader>
 
@@ -178,7 +209,7 @@ export function Chatbot() {
                   </AvatarFallback>
                 </Avatar>
                 <div className="rounded-lg bg-muted p-3 text-sm">
-                  <p>Hello! How can I assist you with the JANConnect Lite app today?</p>
+                  <p>{pageContent.initialMessage}</p>
                 </div>
               </div>
               {messages.map((message, index) => (
@@ -235,7 +266,7 @@ export function Chatbot() {
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Type or speak your message..."
+                placeholder={pageContent.inputPlaceholder}
                 disabled={isLoading}
               />
                <Button type="button" variant={isListening ? 'destructive' : 'outline'} size="icon" onClick={toggleListening} disabled={isLoading}>
@@ -253,3 +284,5 @@ export function Chatbot() {
     </>
   );
 }
+
+    

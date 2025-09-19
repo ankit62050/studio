@@ -12,6 +12,51 @@ import { PlusCircle, FileText, Users, Map as MapIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/hooks/use-language';
+
+const content = {
+    en: {
+        welcome: "Welcome",
+        welcomeDescription: "Ready to make a difference? Report an issue or see what's happening in your community.",
+        reportIssue: "Report a Civic Issue",
+        services: "Our Services",
+        communityTrends: "Community Trends",
+        complaintVolumeTitle: "Complaint Volume (Last 30 Days)",
+        complaintVolumeDescription: "Daily number of new complaints submitted.",
+        categoryBreakdownTitle: "Category Breakdown",
+        categoryBreakdownDescription: "Most common types of complaints reported.",
+        serviceSubmitTitle: "Submit Complaint",
+        serviceSubmitDescription: "Report a new civic issue with details and a photo.",
+        serviceHistoryTitle: "My History",
+        serviceHistoryDescription: "Track the status and updates of all your submissions.",
+        serviceCommunityTitle: "Community Feed",
+        serviceCommunityDescription: "See what issues others are reporting in the community.",
+        serviceMapTitle: "Nearby Issues",
+        serviceMapDescription: "View a map of all reported complaints in the area.",
+        loginMessage: "Please log in to access the dashboard."
+    },
+    hi: {
+        welcome: "आपका स्वागत है",
+        welcomeDescription: "बदलाव लाने के लिए तैयार हैं? किसी समस्या की रिपोर्ट करें या देखें कि आपके समुदाय में क्या हो रहा है।",
+        reportIssue: "एक नागरिक समस्या की रिपोर्ट करें",
+        services: "हमारी सेवाएँ",
+        communityTrends: "सामुदायिक रुझान",
+        complaintVolumeTitle: "शिकायत की मात्रा (पिछले 30 दिन)",
+        complaintVolumeDescription: "प्रतिदिन प्रस्तुत की गई नई शिकायतों की संख्या।",
+        categoryBreakdownTitle: "श्रेणी के अनुसार विवरण",
+        categoryBreakdownDescription: "रिपोर्ट की गई सबसे आम प्रकार की शिकायतें।",
+        serviceSubmitTitle: "शिकायत दर्ज करें",
+        serviceSubmitDescription: "विवरण और फोटो के साथ एक नई नागरिक समस्या की रिपोर्ट करें।",
+        serviceHistoryTitle: "मेरा इतिहास",
+        serviceHistoryDescription: "अपने सभी सबमिशन की स्थिति और अपडेट ट्रैक करें।",
+        serviceCommunityTitle: "सामुदायिक फ़ीड",
+        serviceCommunityDescription: "देखें कि समुदाय में अन्य लोग किन मुद्दों की रिपोर्ट कर रहे हैं।",
+        serviceMapTitle: "आस-पास के मुद्दे",
+        serviceMapDescription: "क्षेत्र में रिपोर्ट की गई सभी शिकायतों کا نقشہ دیکھیں۔",
+        loginMessage: "कृपया डैशबोर्ड तक पहुंचने के लिए लॉग इन करें।"
+    }
+}
+
 
 type ServiceCardProps = {
   href: string;
@@ -41,14 +86,16 @@ function ServiceCard({ href, icon, title, description }: ServiceCardProps) {
 export default function DashboardPage() {
   const { user } = useAuth();
   const { complaints } = useComplaints();
+  const { language } = useLanguage();
+  const pageContent = content[language];
   
   if (!user) {
     // This part can be improved to show a proper landing/login page
     return (
         <div className="flex items-center justify-center h-[calc(100vh-10rem)]">
             <div className="text-center">
-                <h1 className="text-4xl font-bold tracking-tight mb-4">Welcome to JANConnect Lite</h1>
-                <p className="text-muted-foreground mb-8">Please log in to access the dashboard.</p>
+                <h1 className="text-4xl font-bold tracking-tight mb-4">{content.en.welcome} to JANConnect Lite</h1>
+                <p className="text-muted-foreground mb-8">{pageContent.loginMessage}</p>
             </div>
         </div>
     )
@@ -58,26 +105,26 @@ export default function DashboardPage() {
     {
       href: '/submit',
       icon: <PlusCircle className="w-7 h-7" />,
-      title: 'Submit Complaint',
-      description: 'Report a new civic issue with details and a photo.',
+      title: pageContent.serviceSubmitTitle,
+      description: pageContent.serviceSubmitDescription,
     },
     {
       href: '/history',
       icon: <FileText className="w-7 h-7" />,
-      title: 'My History',
-      description: 'Track the status and updates of all your submissions.',
+      title: pageContent.serviceHistoryTitle,
+      description: pageContent.serviceHistoryDescription,
     },
     {
       href: '/community',
       icon: <Users className="w-7 h-7" />,
-      title: 'Community Feed',
-      description: 'See what issues others are reporting in the community.',
+      title: pageContent.serviceCommunityTitle,
+      description: pageContent.serviceCommunityDescription,
     },
     {
       href: '/map',
       icon: <MapIcon className="w-7 h-7" />,
-      title: 'Nearby Issues',
-      description: 'View a map of all reported complaints in the area.',
+      title: pageContent.serviceMapTitle,
+      description: pageContent.serviceMapDescription,
     },
   ];
 
@@ -133,21 +180,21 @@ export default function DashboardPage() {
       <Card className="bg-gradient-to-br from-background to-primary/10">
         <CardContent className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
             <div className="space-y-2 text-center md:text-left">
-                <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Welcome, {user.name}!</h1>
+                <h1 className="text-3xl md:text-4xl font-bold tracking-tight">{pageContent.welcome}, {user.name}!</h1>
                 <p className="text-muted-foreground max-w-2xl">
-                    Ready to make a difference? Report an issue or see what's happening in your community.
+                    {pageContent.welcomeDescription}
                 </p>
             </div>
              <Button asChild size="lg" className="w-full sm:w-auto">
                 <Link href="/submit">
-                  <PlusCircle className="mr-2" /> Report a Civic Issue
+                  <PlusCircle className="mr-2" /> {pageContent.reportIssue}
                 </Link>
               </Button>
         </CardContent>
       </Card>
       
       <div>
-        <h2 className="text-2xl font-bold tracking-tight mb-4">Our Services</h2>
+        <h2 className="text-2xl font-bold tracking-tight mb-4">{pageContent.services}</h2>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
           {services.map((service) => (
             <ServiceCard key={service.href} {...service} />
@@ -156,12 +203,12 @@ export default function DashboardPage() {
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold tracking-tight">Community Trends</h2>
+        <h2 className="text-2xl font-bold tracking-tight">{pageContent.communityTrends}</h2>
         <div className="grid gap-8 md:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle>Complaint Volume (Last 30 Days)</CardTitle>
-                <CardDescription>Daily number of new complaints submitted.</CardDescription>
+                <CardTitle>{pageContent.complaintVolumeTitle}</CardTitle>
+                <CardDescription>{pageContent.complaintVolumeDescription}</CardDescription>
               </CardHeader>
               <CardContent>
                 <ChartContainer config={chartConfig} className="h-[350px] w-full">
@@ -189,8 +236,8 @@ export default function DashboardPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Category Breakdown</CardTitle>
-                <CardDescription>Most common types of complaints reported.</CardDescription>
+                <CardTitle>{pageContent.categoryBreakdownTitle}</CardTitle>
+                <CardDescription>{pageContent.categoryBreakdownDescription}</CardDescription>
               </CardHeader>
               <CardContent>
                 <ChartContainer config={chartConfig} className="h-[350px] w-full">
@@ -222,5 +269,7 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
 
     
