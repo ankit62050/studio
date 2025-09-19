@@ -16,6 +16,22 @@ import { Shield, MapIcon, Mail, HelpCircle } from 'lucide-react';
 import { Chatbot } from '../chatbot';
 import { cn } from '@/lib/utils';
 import { UserNav } from '../user-nav';
+import { useLanguage } from '@/hooks/use-language';
+
+const content = {
+  en: {
+    dashboard: 'Dashboard',
+    mapView: 'Map View',
+    faq: 'FAQ',
+    contact: 'Contact',
+  },
+  hi: {
+    dashboard: 'डैशबोर्ड',
+    mapView: 'मानचित्र दृश्य',
+    faq: 'सामान्य प्रश्न',
+    contact: 'संपर्क',
+  },
+};
 
 const LogoIcon = () => {
     return (
@@ -32,12 +48,14 @@ export function AdminLayout({ children }: { children: React.ReactNode}) {
   const pathname = usePathname();
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
+  const { language } = useLanguage();
+  const pageContent = content[language];
 
   const links = [
-    { href: '/admin', label: 'Dashboard', icon: <Shield className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" /> },
-    { href: '/admin/map', label: 'Map View', icon: <MapIcon className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" /> },
-    { href: '/faq', label: 'FAQ', icon: <HelpCircle className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" /> },
-    { href: '/contact', label: 'Contact', icon: <Mail className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" /> },
+    { href: '/admin', label: pageContent.dashboard, icon: <Shield className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" /> },
+    { href: '/admin/map', label: pageContent.mapView, icon: <MapIcon className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" /> },
+    { href: '/faq', label: pageContent.faq, icon: <HelpCircle className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" /> },
+    { href: '/contact', label: pageContent.contact, icon: <Mail className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" /> },
   ];
 
   return (
@@ -104,3 +122,5 @@ export function AdminLayout({ children }: { children: React.ReactNode}) {
     </div>
   );
 }
+
+    

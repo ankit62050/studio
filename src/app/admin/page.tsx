@@ -42,6 +42,93 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { ExpandableTabs } from '@/components/ui/expandable-tabs';
+import { useLanguage } from '@/hooks/use-language';
+
+const content = {
+  en: {
+    dashboardTitle: 'Admin Dashboard',
+    dashboardDescription: 'Overview of all citizen complaints and trends.',
+    communityTrends: 'Community Trends',
+    complaintVolumeTitle: 'Complaint Volume (Last 30 Days)',
+    complaintVolumeDescription: 'Daily number of new complaints submitted.',
+    categoryBreakdownTitle: 'Category Breakdown',
+    categoryBreakdownDescription: 'Most common types of complaints reported.',
+    complaintListTitle: 'Complaint List',
+    filteredBy: 'Filtered by:',
+    tableHeadUser: 'User',
+    tableHeadCategory: 'Category',
+    tableHeadDescription: 'Description',
+    tableHeadLocation: 'Location',
+    tableHeadSubmitted: 'Submitted',
+    tableHeadStatus: 'Status',
+    tableHeadFeedback: 'Feedback',
+    tableHeadImages: 'Images',
+    tableHeadActions: 'Actions',
+    aiProcess: 'AI Process',
+    addPhoto: 'Add Photo',
+    feedbackPopoverTitle: 'Feedback',
+    feedbackNotAvailable: 'N/A',
+    dialogTitle: 'AI Complaint Processing Suggestions',
+    dialogDescription: 'The AI has analyzed the complaint and provided the following recommendations. Review and accept to update the complaint.',
+    dialogComplaintTitle: 'Complaint',
+    dialogSuggestionsTitle: 'AI Suggestions',
+    dialogCategory: 'Category:',
+    dialogDepartment: 'Department:',
+    dialogPriority: 'Priority:',
+    dialogOfficer: 'Officer:',
+    dialogReasoning: 'Reasoning',
+    dialogCancel: 'Cancel',
+    dialogAccept: 'Accept & Update',
+    complaintUpdatedToast: 'Complaint Updated',
+    complaintUpdatedToastDesc: 'The complaint has been updated based on AI suggestions.',
+    allFilter: (count: number) => `All (${count})`,
+    pendingFilter: (count: number) => `Pending (${count})`,
+    inProgressFilter: (count: number) => `In Progress (${count})`,
+    resolvedFilter: (count: number) => `Resolved (${count})`,
+  },
+  hi: {
+    dashboardTitle: 'एडमिन डैशबोर्ड',
+    dashboardDescription: 'सभी नागरिक शिकायतों और रुझानों का अवलोकन।',
+    communityTrends: 'सामुदायिक रुझान',
+    complaintVolumeTitle: 'शिकायत की मात्रा (पिछले 30 दिन)',
+    complaintVolumeDescription: 'प्रतिदिन प्रस्तुत की गई नई शिकायतों की संख्या।',
+    categoryBreakdownTitle: 'श्रेणी के अनुसार विवरण',
+    categoryBreakdownDescription: 'सबसे आम प्रकार की शिकायतें।',
+    complaintListTitle: 'शिकायत सूची',
+    filteredBy: 'फ़िल्टर:',
+    tableHeadUser: 'उपयोगकर्ता',
+    tableHeadCategory: 'श्रेणी',
+    tableHeadDescription: 'विवरण',
+    tableHeadLocation: 'स्थान',
+    tableHeadSubmitted: 'प्रस्तुत',
+    tableHeadStatus: 'स्थिति',
+    tableHeadFeedback: 'प्रतिक्रिया',
+    tableHeadImages: 'छवियाँ',
+    tableHeadActions: 'कार्रवाइयाँ',
+    aiProcess: 'एआई प्रक्रिया',
+    addPhoto: 'फोटो जोड़ें',
+    feedbackPopoverTitle: 'प्रतिक्रिया',
+    feedbackNotAvailable: 'लागू नहीं',
+    dialogTitle: 'एआई शिकायत प्रसंस्करण सुझाव',
+    dialogDescription: 'एआई ने शिकायत का विश्लेषण किया है और निम्नलिखित सिफारिशें प्रदान की हैं। शिकायत को अपडेट करने के लिए समीक्षा करें और स्वीकार करें।',
+    dialogComplaintTitle: 'शिकायत',
+    dialogSuggestionsTitle: 'एआई सुझाव',
+    dialogCategory: 'श्रेणी:',
+    dialogDepartment: 'विभाग:',
+    dialogPriority: 'प्राथमिकता:',
+    dialogOfficer: 'अधिकारी:',
+    dialogReasoning: 'तर्क',
+    dialogCancel: 'रद्द करें',
+    dialogAccept: 'स्वीकार करें और अपडेट करें',
+    complaintUpdatedToast: 'शिकायत अपडेट की गई',
+    complaintUpdatedToastDesc: 'एआई सुझावों के आधार पर शिकायत को अपडेट कर दिया गया है।',
+    allFilter: (count: number) => `सभी (${count})`,
+    pendingFilter: (count: number) => `लंबित (${count})`,
+    inProgressFilter: (count: number) => `प्रगति में (${count})`,
+    resolvedFilter: (count: number) => `हल (${count})`,
+  },
+};
+
 
 type StatusFilter = ComplaintStatus | 'Pending' | 'All';
 
@@ -50,6 +137,8 @@ export default function AdminDashboardPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const currentComplaintAction = useRef<{ complaintId: string; status: ComplaintStatus } | null>(null);
   const { toast } = useToast();
+  const { language } = useLanguage();
+  const pageContent = content[language];
 
   const [processingComplaintId, setProcessingComplaintId] = useState<string | null>(null);
   const [suggestion, setSuggestion] = useState<ProcessComplaintOutput | null>(null);
@@ -121,8 +210,8 @@ export default function AdminDashboardPage() {
         status: 'Under Review'
     });
     toast({
-        title: 'Complaint Updated',
-        description: 'The complaint has been updated based on AI suggestions.',
+        title: pageContent.complaintUpdatedToast,
+        description: pageContent.complaintUpdatedToastDesc,
     });
     setIsSuggestionDialogOpen(false);
     setSuggestion(null);
@@ -193,12 +282,12 @@ export default function AdminDashboardPage() {
     const pendingCount = statusCounts['Received'] + statusCounts['Under Review'];
 
     return [
-      { title: `All (${complaints.length})`, icon: List, filter: 'All' },
-      { title: `Pending (${pendingCount})`, icon: Hourglass, filter: 'Pending' },
-      { title: `In Progress (${statusCounts['Work in Progress']})`, icon: Workflow, filter: 'Work in Progress' },
-      { title: `Resolved (${statusCounts['Resolved']})`, icon: CheckCircle, filter: 'Resolved' },
+      { title: pageContent.allFilter(complaints.length), icon: List, filter: 'All' },
+      { title: pageContent.pendingFilter(pendingCount), icon: Hourglass, filter: 'Pending' },
+      { title: pageContent.inProgressFilter(statusCounts['Work in Progress']), icon: Workflow, filter: 'Work in Progress' },
+      { title: pageContent.resolvedFilter(statusCounts['Resolved']), icon: CheckCircle, filter: 'Resolved' },
     ];
-  }, [complaints]);
+  }, [complaints, pageContent]);
   
   const handleFilterChange = (index: number | null) => {
     setSelectedTabIndex(index);
@@ -213,19 +302,19 @@ export default function AdminDashboardPage() {
     <div className="space-y-8">
        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
-          <p className="text-muted-foreground">Overview of all citizen complaints and trends.</p>
+          <h1 className="text-3xl font-bold tracking-tight">{pageContent.dashboardTitle}</h1>
+          <p className="text-muted-foreground">{pageContent.dashboardDescription}</p>
         </div>
         <ExpandableTabs tabs={filterTabs} onChange={handleFilterChange} />
       </div>
 
        <div className="space-y-4">
-        <h2 className="text-2xl font-bold tracking-tight">Community Trends</h2>
+        <h2 className="text-2xl font-bold tracking-tight">{pageContent.communityTrends}</h2>
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle>Complaint Volume (Last 30 Days)</CardTitle>
-                <CardDescription>Daily number of new complaints submitted.</CardDescription>
+                <CardTitle>{pageContent.complaintVolumeTitle}</CardTitle>
+                <CardDescription>{pageContent.complaintVolumeDescription}</CardDescription>
               </CardHeader>
               <CardContent>
                 <ChartContainer config={chartConfig} className="h-[350px] w-full">
@@ -253,8 +342,8 @@ export default function AdminDashboardPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Category Breakdown</CardTitle>
-                <CardDescription>Most common types of complaints reported.</CardDescription>
+                <CardTitle>{pageContent.categoryBreakdownTitle}</CardTitle>
+                <CardDescription>{pageContent.categoryBreakdownDescription}</CardDescription>
               </CardHeader>
               <CardContent>
                 <ChartContainer config={chartConfig} className="h-[350px] w-full">
@@ -286,8 +375,8 @@ export default function AdminDashboardPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Complaint List</CardTitle>
-          <CardDescription>Filtered by: {activeFilter}</CardDescription>
+          <CardTitle>{pageContent.complaintListTitle}</CardTitle>
+          <CardDescription>{pageContent.filteredBy} {activeFilter}</CardDescription>
         </CardHeader>
         <CardContent>
           <Input
@@ -301,15 +390,15 @@ export default function AdminDashboardPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>User</TableHead>
-                  <TableHead className="hidden sm:table-cell">Category</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead className="hidden md:table-cell">Location</TableHead>
-                  <TableHead className="hidden lg:table-cell">Submitted</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="hidden sm:table-cell">Feedback</TableHead>
-                  <TableHead>Images</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead>{pageContent.tableHeadUser}</TableHead>
+                  <TableHead className="hidden sm:table-cell">{pageContent.tableHeadCategory}</TableHead>
+                  <TableHead>{pageContent.tableHeadDescription}</TableHead>
+                  <TableHead className="hidden md:table-cell">{pageContent.tableHeadLocation}</TableHead>
+                  <TableHead className="hidden lg:table-cell">{pageContent.tableHeadSubmitted}</TableHead>
+                  <TableHead>{pageContent.tableHeadStatus}</TableHead>
+                  <TableHead className="hidden sm:table-cell">{pageContent.tableHeadFeedback}</TableHead>
+                  <TableHead>{pageContent.tableHeadImages}</TableHead>
+                  <TableHead>{pageContent.tableHeadActions}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -362,7 +451,7 @@ export default function AdminDashboardPage() {
                             <PopoverContent className="w-80">
                               <div className="grid gap-4">
                                 <div className="space-y-2">
-                                  <h4 className="font-medium leading-none">Feedback</h4>
+                                  <h4 className="font-medium leading-none">{pageContent.feedbackPopoverTitle}</h4>
                                   <p className="text-sm text-muted-foreground">
                                     {complaint.feedback.comment}
                                   </p>
@@ -371,7 +460,7 @@ export default function AdminDashboardPage() {
                             </PopoverContent>
                           </Popover>
                         ) : (
-                          <span className="text-xs text-muted-foreground">N/A</span>
+                          <span className="text-xs text-muted-foreground">{pageContent.feedbackNotAvailable}</span>
                         )}
                       </TableCell>
                       <TableCell>
@@ -411,17 +500,17 @@ export default function AdminDashboardPage() {
                           {complaint.status === 'Received' && (
                             <Button variant="outline" size="sm" onClick={() => handleProcessComplaint(complaint)} disabled={isProcessing}>
                               {isProcessing ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Sparkles className="mr-2 h-4 w-4"/>}
-                              AI Process
+                              {pageContent.aiProcess}
                             </Button>
                           )}
                           {complaint.status === 'Work in Progress' && (
                               <Button variant="outline" size="sm" onClick={() => handleAddPhotoClick(complaint.id, 'Work in Progress')}>
-                                  <Camera className="mr-2 h-4 w-4"/> Add Photo
+                                  <Camera className="mr-2 h-4 w-4"/> {pageContent.addPhoto}
                               </Button>
                           )}
                           {complaint.status === 'Resolved' && !complaint.afterImageUrl && (
                               <Button variant="outline" size="sm" onClick={() => handleAddPhotoClick(complaint.id, 'Resolved')}>
-                                  <Camera className="mr-2 h-4 w-4"/> Add Photo
+                                  <Camera className="mr-2 h-4 w-4"/> {pageContent.addPhoto}
                               </Button>
                           )}
                       </TableCell>
@@ -438,36 +527,36 @@ export default function AdminDashboardPage() {
         <Dialog open={isSuggestionDialogOpen} onOpenChange={setIsSuggestionDialogOpen}>
             <DialogContent className="max-w-2xl">
                 <DialogHeader>
-                <DialogTitle>AI Complaint Processing Suggestions</DialogTitle>
+                <DialogTitle>{pageContent.dialogTitle}</DialogTitle>
                 <DialogDescription>
-                    The AI has analyzed the complaint and provided the following recommendations. Review and accept to update the complaint.
+                    {pageContent.dialogDescription}
                 </DialogDescription>
                 </DialogHeader>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 py-4">
                     <div className="space-y-4">
-                        <h4 className="font-semibold text-lg">Complaint</h4>
+                        <h4 className="font-semibold text-lg">{pageContent.dialogComplaintTitle}</h4>
                         <p className="text-sm text-muted-foreground p-4 bg-muted/50 rounded-lg">{currentComplaintForDialog.description}</p>
                          {currentComplaintForDialog.beforeImageUrls && currentComplaintForDialog.beforeImageUrls[0] && (
                            <Image src={currentComplaintForDialog.beforeImageUrls[0]} alt="Complaint" width={300} height={225} className="rounded-lg object-cover" />
                         )}
                     </div>
                     <div className="space-y-4">
-                        <h4 className="font-semibold text-lg">AI Suggestions</h4>
+                        <h4 className="font-semibold text-lg">{pageContent.dialogSuggestionsTitle}</h4>
                         <div className="space-y-2">
-                            <div className="flex items-center gap-2"><Layers className="text-primary"/> <strong>Category:</strong> <Badge variant="outline">{suggestion.suggestedCategory}</Badge></div>
-                            <div className="flex items-center gap-2"><Building className="text-primary"/> <strong>Department:</strong> {suggestion.recommendedDepartment}</div>
-                            <div className="flex items-center gap-2"><Shield className="text-primary"/> <strong>Priority:</strong> {suggestion.priority}</div>
-                            <div className="flex items-center gap-2"><UserIcon className="text-primary"/> <strong>Officer:</strong> {suggestion.assignedOfficer.name}</div>
+                            <div className="flex items-center gap-2"><Layers className="text-primary"/> <strong>{pageContent.dialogCategory}</strong> <Badge variant="outline">{suggestion.suggestedCategory}</Badge></div>
+                            <div className="flex items-center gap-2"><Building className="text-primary"/> <strong>{pageContent.dialogDepartment}</strong> {suggestion.recommendedDepartment}</div>
+                            <div className="flex items-center gap-2"><Shield className="text-primary"/> <strong>{pageContent.dialogPriority}</strong> {suggestion.priority}</div>
+                            <div className="flex items-center gap-2"><UserIcon className="text-primary"/> <strong>{pageContent.dialogOfficer}</strong> {suggestion.assignedOfficer.name}</div>
                         </div>
                         <div>
-                            <h5 className="font-semibold mb-2 mt-4">Reasoning</h5>
+                            <h5 className="font-semibold mb-2 mt-4">{pageContent.dialogReasoning}</h5>
                             <p className="text-sm text-muted-foreground p-4 bg-muted/50 rounded-lg">{suggestion.reasoning}</p>
                         </div>
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button variant="ghost" onClick={() => setIsSuggestionDialogOpen(false)}>Cancel</Button>
-                    <Button onClick={handleAcceptSuggestion}>Accept & Update</Button>
+                    <Button variant="ghost" onClick={() => setIsSuggestionDialogOpen(false)}>{pageContent.dialogCancel}</Button>
+                    <Button onClick={handleAcceptSuggestion}>{pageContent.dialogAccept}</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
@@ -477,5 +566,7 @@ export default function AdminDashboardPage() {
   );
 }
 
+
+    
 
     
