@@ -46,8 +46,8 @@ export function UserNav() {
     return (
       <div className="flex items-center gap-2">
         <LanguageToggle />
-        <Button onClick={() => login('citizen')}>{navContent.login}</Button>
-        <Button variant="outline" onClick={() => login('citizen')}>{navContent.signUp}</Button>
+        <Button onClick={() => login()}>{navContent.login}</Button>
+        <Button variant="outline" onClick={() => login()}>{navContent.signUp}</Button>
       </div>
     );
   }
@@ -104,5 +104,3 @@ export function UserNav() {
     </div>
   );
 }
-
-    

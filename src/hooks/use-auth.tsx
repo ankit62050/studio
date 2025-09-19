@@ -11,7 +11,7 @@ interface AuthContextType {
   user: AppUser | null;
   firebaseUser: FirebaseUser | null;
   loading: boolean;
-  login: (role: 'citizen' | 'admin') => void;
+  login: (role?: 'citizen' | 'admin') => void;
   logout: () => void;
 }
 
@@ -23,7 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [targetRole, setTargetRole] = useState<'citizen' | 'admin' | null>(null);
 
-  const handleLogin = async (role: 'citizen' | 'admin') => {
+  const handleLogin = async (role: 'citizen' | 'admin' = 'citizen') => {
     setLoading(true);
     setTargetRole(role);
     try {
