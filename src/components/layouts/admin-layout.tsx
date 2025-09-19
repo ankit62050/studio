@@ -14,7 +14,6 @@ import { Logo } from '@/components/logo';
 import { useAuth } from '@/hooks/use-auth';
 import { Shield, MapIcon, Mail, HelpCircle } from 'lucide-react';
 import { Chatbot } from '../chatbot';
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { UserNav } from '../user-nav';
 
@@ -44,7 +43,7 @@ export function AdminLayout({ children }: { children: React.ReactNode}) {
   return (
     <div
       className={cn(
-        "rounded-md flex flex-col md:flex-row bg-gray-100 dark:bg-neutral-800 w-full flex-1 h-screen mx-auto border border-neutral-200 dark:border-neutral-700 overflow-hidden"
+        "rounded-md flex flex-col md:flex-row bg-gray-100 dark:bg-neutral-800 w-full flex-1 h-screen mx-auto border border-neutral-200 dark:border-neutral-700"
       )}
     >
       <Sidebar open={open} setOpen={setOpen}>
@@ -78,7 +77,7 @@ export function AdminLayout({ children }: { children: React.ReactNode}) {
           )}
         </SidebarBody>
       </Sidebar>
-      <main className="flex flex-1 flex-col">
+      <main className="flex-1 flex flex-col h-screen">
         <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="relative">
                 <div className="absolute top-0 left-0 w-full h-1 flex">
