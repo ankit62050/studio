@@ -198,7 +198,10 @@ function SignInCard() {
                     <Button
                     type="submit"
                     className="w-full relative overflow-hidden"
-                    onClick={() => login('citizen')}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        login('citizen')
+                    }}
                     >
                     <span className="flex items-center justify-center">
                         {pageContent.signIn}
