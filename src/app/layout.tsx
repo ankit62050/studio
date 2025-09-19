@@ -4,6 +4,7 @@ import { AuthProvider } from '@/hooks/use-auth';
 import { Toaster } from '@/components/ui/toaster';
 import { AppWrapper } from '@/components/app-wrapper';
 import { ComplaintsProvider } from '@/hooks/use-complaints';
+import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {
   title: 'JANConnect Lite',
@@ -29,12 +30,19 @@ export default function RootLayout({
           crossOrigin=""/>
       </head>
       <body className="font-body antialiased">
-        <AuthProvider>
-          <ComplaintsProvider>
-            <AppWrapper>{children}</AppWrapper>
-          </ComplaintsProvider>
-          <Toaster />
-        </AuthProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>
+            <ComplaintsProvider>
+              <AppWrapper>{children}</AppWrapper>
+            </ComplaintsProvider>
+            <Toaster />
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

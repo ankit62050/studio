@@ -35,6 +35,9 @@
     --sidebar-accent-foreground: 224 71.4% 4.1%;
     --sidebar-border: 220 13% 85%;
     --sidebar-ring: 12 100% 60%;
+    
+    --brand: 27 96% 61%;
+    --brand-foreground: 31 97% 72%;
   }
 
   .dark {
@@ -68,6 +71,9 @@
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 215 27.9% 16.9%;
     --sidebar-ring: 12 100% 60%;
+
+    --brand: 31 97% 72%;
+    --brand-foreground: 27 96% 61%;
   }
 }
 
@@ -77,5 +83,20 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .delay-100 {
+    animation-delay: 100ms;
+  }
+  .delay-300 {
+    animation-delay: 300ms;
+  }
+  .delay-700 {
+    animation-delay: 700ms;
+  }
+  .delay-1000 {
+    animation-delay: 1000ms;
   }
 }
