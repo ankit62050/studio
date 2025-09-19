@@ -198,10 +198,7 @@ function SignInCard() {
                     <Button
                     type="submit"
                     className="w-full relative overflow-hidden"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        login('citizen')
-                    }}
+                    onClick={() => login('citizen')}
                     >
                     <span className="flex items-center justify-center">
                         {pageContent.signIn}
@@ -369,7 +366,7 @@ export default function DashboardPage() {
 
       <div className="space-y-4">
         <h2 className="text-2xl font-bold tracking-tight">Community Trends</h2>
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-2">
+        <div className="grid gap-8 md:grid-cols-2">
             <Card>
               <CardHeader>
                 <CardTitle>Complaint Volume (Last 30 Days)</CardTitle>
@@ -434,5 +431,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
