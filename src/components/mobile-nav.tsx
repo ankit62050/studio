@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Home, PlusCircle, History, User, Shield, Users, Map as MapIcon } from 'lucide-react';
+import { Home, PlusCircle, History, User, Shield, Users, Map as MapIcon, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 
 export function MobileNav() {
@@ -12,9 +12,9 @@ export function MobileNav() {
   const { user } = useAuth();
   
   const citizenRoutes = [
-    { href: '/', label: 'Home', icon: Home },
     { href: '/community', label: 'Community', icon: Users },
     { href: '/map', label: 'Map', icon: MapIcon },
+    { href: '/', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/submit', label: 'Submit', icon: PlusCircle },
     { href: '/history', label: 'History', icon: History },
     { href: '/profile', label: 'Profile', icon: User },
@@ -54,3 +54,4 @@ export function MobileNav() {
     </div>
   );
 }
+
