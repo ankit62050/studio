@@ -215,21 +215,21 @@ function HistoryPageContent() {
                     {complaint.beforeImageUrls && complaint.beforeImageUrls.length > 0 && (
                          <div>
                             <h4 className="font-semibold mb-2">Before</h4>
-                            <Carousel className="w-full max-w-lg mx-auto">
-                                <CarouselContent>
-                                    {complaint.beforeImageUrls.map((img, index) => (
-                                        <CarouselItem key={index}>
-                                            <Image src={img} alt={`Before image ${index + 1}`} width={600} height={400} className="rounded-lg object-cover aspect-video" />
-                                        </CarouselItem>
-                                    ))}
-                                </CarouselContent>
-                                {complaint.beforeImageUrls.length > 1 && (
-                                    <>
-                                        <CarouselPrevious className="left-2" />
-                                        <CarouselNext className="right-2" />
-                                    </>
-                                )}
-                            </Carousel>
+                            {complaint.beforeImageUrls.length > 1 ? (
+                                <Carousel className="w-full max-w-lg mx-auto">
+                                    <CarouselContent>
+                                        {complaint.beforeImageUrls.map((img, index) => (
+                                            <CarouselItem key={index}>
+                                                <Image src={img} alt={`Before image ${index + 1}`} width={600} height={400} className="rounded-lg object-cover aspect-video" />
+                                            </CarouselItem>
+                                        ))}
+                                    </CarouselContent>
+                                    <CarouselPrevious className="left-2" />
+                                    <CarouselNext className="right-2" />
+                                </Carousel>
+                            ) : (
+                                <Image src={complaint.beforeImageUrls[0]} alt={`Before image 1`} width={600} height={400} className="rounded-lg object-cover aspect-video" />
+                            )}
                         </div>
                     )}
                     {complaint.afterImageUrl && (
