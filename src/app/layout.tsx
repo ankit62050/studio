@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { AuthProvider } from '@/hooks/use-auth';
@@ -5,6 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { AppWrapper } from '@/components/app-wrapper';
 import { ComplaintsProvider } from '@/hooks/use-complaints';
 import { ThemeProvider } from "next-themes";
+import { LanguageProvider } from '@/hooks/use-language';
 
 export const metadata: Metadata = {
   title: 'JANConnect Lite',
@@ -38,7 +40,9 @@ export default function RootLayout({
         >
           <AuthProvider>
             <ComplaintsProvider>
-              <AppWrapper>{children}</AppWrapper>
+              <LanguageProvider>
+                <AppWrapper>{children}</AppWrapper>
+              </LanguageProvider>
             </ComplaintsProvider>
             <Toaster />
           </AuthProvider>

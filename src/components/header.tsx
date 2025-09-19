@@ -1,9 +1,10 @@
+
 import { MainNav } from '@/components/main-nav';
 import { UserNav } from '@/components/user-nav';
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-40 w-full bg-gradient-to-r from-blue-800 to-info text-info-foreground">
+    <header className="sticky top-0 z-40 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
       <div className="relative">
         <div className="absolute top-0 left-0 w-full h-1 flex">
           <div className="flex-1 bg-primary"></div>

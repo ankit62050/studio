@@ -16,6 +16,20 @@ export const users: User[] = [
     role: 'admin',
     avatarUrl: 'https://picsum.photos/seed/avatar2/100/100',
   },
+   {
+    id: 'TBD', // This will be replaced by Firebase UID
+    name: 'Admin User',
+    email: 'admin@example.com', // Match a real test Google account
+    role: 'admin',
+    avatarUrl: 'https://picsum.photos/seed/admin-avatar/100/100',
+  },
+  {
+    id: 'TBD', // This will be replaced by Firebase UID
+    name: 'Citizen User',
+    email: 'citizen@example.com', // Match a real test Google account
+    role: 'citizen',
+    avatarUrl: 'https://picsum.photos/seed/citizen-avatar/100/100',
+  },
 ];
 
 export const officers: Officer[] = [

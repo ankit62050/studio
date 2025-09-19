@@ -29,23 +29,21 @@ export function MainNav({
 
   const routes = user?.role === 'admin' ? adminRoutes : citizenRoutes;
 
-  if (!user) return null;
-
   return (
     <nav
       className={cn('hidden md:flex items-center gap-6 text-sm', className)}
       {...props}
     >
-      <Link href={user.role === 'admin' ? '/admin' : '/'} className='mr-4'>
+      <Link href={user ? (user.role === 'admin' ? '/admin' : '/') : '/'} className='mr-4'>
         <Logo />
       </Link>
-      {routes.map((route) => (
+      {user && routes.map((route) => (
         <Link
           key={route.href}
           href={route.href}
           className={cn(
-            'relative font-medium text-white/80 transition-colors hover:text-white',
-            pathname === route.href && 'text-white',
+            'relative font-medium text-foreground/80 transition-colors hover:text-foreground',
+            pathname === route.href && 'text-foreground',
             'after:absolute after:bottom-[-2px] after:left-0 after:h-0.5 after:w-full after:origin-bottom-right after:scale-x-0 after:bg-primary after:transition-transform after:duration-300 after:ease-out hover:after:origin-bottom-left hover:after:scale-x-100',
             pathname === route.href && 'after:origin-bottom-left after:scale-x-100'
           )}
