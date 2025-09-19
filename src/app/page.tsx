@@ -2,7 +2,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ComplaintCard } from '@/components/complaint-card';
 import { useAuth } from '@/hooks/use-auth';
 import { useComplaints } from '@/hooks/use-complaints';
@@ -10,7 +10,6 @@ import { FileText, Hourglass, CheckCircle, ArrowRight } from 'lucide-react';
 import { ComplaintStatus, complaintStatuses } from '@/lib/types';
 import Link from 'next/link';
 import { useLanguage } from '@/hooks/use-language';
-import { Hero } from "@/components/ui/hero"
 import { Button } from '@/components/ui/button';
 
 const content = {
@@ -87,29 +86,13 @@ export default function DashboardPage() {
 
     if (!user) {
         return (
-            <main className="min-h-screen flex flex-col bg-[#f3f1ea] -mt-8 -mx-8">
-              <Hero
-                eyebrow="JANCONNECT LITE"
-                title={
-                  <>
-                    <div className="whitespace-nowrap">
-                      <span className="font-instrument-serif font-normal">Your Voice, </span>
-                      <span className="font-instrument-serif font-normal italic">Seamlessly </span>
-                      <span className="font-instrument-serif font-normal">Heard</span>
-                    </div>
-                  </>
-                }
-                subtitle="JANConnect Lite brings your community's needs and local governance together."
-                ctaText={pageContent.login}
-                ctaLink="#"
-                mockupImage={{
-                  src: "https://picsum.photos/seed/notion-calendar/1274/1043",
-                  alt: "App interface mockup",
-                  width: 1274,
-                  height: 1043
-                }}
-              />
-            </main>
+            <div className="flex flex-col items-center justify-center h-full text-center">
+                <h1 className="text-4xl font-bold tracking-tight mb-4">Welcome to JANConnect Lite</h1>
+                <p className="text-xl text-muted-foreground mb-8">Your direct line to civic action.</p>
+                <Button size="lg" onClick={() => login('citizen')}>
+                    {pageContent.login}
+                </Button>
+            </div>
           )
     }
 
