@@ -136,10 +136,19 @@ export default function DashboardPage() {
               </Button>
         </CardContent>
       </Card>
+      
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight mb-4">Our Services</h2>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
+          {services.map((service) => (
+            <ServiceCard key={service.href} {...service} />
+          ))}
+        </div>
+      </div>
 
       <div className="space-y-4">
         <h2 className="text-2xl font-bold tracking-tight">Community Trends</h2>
-        <div className="grid gap-8 md:grid-cols-1 lg:grid-cols-2">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-2">
             <Card>
               <CardHeader>
                 <CardTitle>Complaint Volume (Last 30 Days)</CardTitle>
@@ -199,15 +208,6 @@ export default function DashboardPage() {
                 </ChartContainer>
               </CardContent>
             </Card>
-        </div>
-      </div>
-
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight mb-4">Our Services</h2>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
-          {services.map((service) => (
-            <ServiceCard key={service.href} {...service} />
-          ))}
         </div>
       </div>
     </div>
