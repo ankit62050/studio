@@ -54,8 +54,8 @@ export const complaints: Complaint[] = [
     status: 'Resolved',
     submittedAt: '2024-07-15T09:30:00Z',
     resolvedAt: '2024-07-18T14:00:00Z',
-    beforeImageUrls: ['https://picsum.photos/seed/garbage-overflow/600/400'],
-    afterImageUrl: 'https://picsum.photos/seed/clean-street/600/400',
+    beforeImageUrls: ['https://images.unsplash.com/photo-1579348372325-a473c39396d6?q=80&w=600&h=400&fit=crop'],
+    afterImageUrl: 'https://images.unsplash.com/photo-1621431639534-e82f72498739?q=80&w=600&h=400&fit=crop',
     feedback: {
         rating: 4,
         comment: "The issue was resolved quickly once it was assigned. Good job!"
@@ -76,9 +76,9 @@ export const complaints: Complaint[] = [
     longitude: 77.2105,
     status: 'Work in Progress',
     submittedAt: '2024-07-20T11:00:00Z',
-    beforeImageUrls: ['https://picsum.photos/seed/road-pothole/600/400'],
+    beforeImageUrls: ['https://images.unsplash.com/photo-1515263487990-61b07816b324?q=80&w=600&h=400&fit=crop'],
     progressImageUrls: [
-        { status: 'Work in Progress', imageUrl: 'https://picsum.photos/seed/road-work/600/400' }
+        { status: 'Work in Progress', imageUrl: 'https://images.unsplash.com/photo-1589993302324-a6b3fb4a7c97?q=80&w=600&h=400&fit=crop' }
     ],
     upvotedBy: ['user-2'],
     comments: []
@@ -93,7 +93,7 @@ export const complaints: Complaint[] = [
     longitude: 77.216,
     status: 'Under Review',
     submittedAt: '2024-07-22T18:45:00Z',
-    beforeImageUrls: ['https://picsum.photos/seed/graffiti-wall/600/400'],
+    beforeImageUrls: ['https://images.unsplash.com/photo-1528749969521-194d34192074?q=80&w=600&h=400&fit=crop'],
     upvotedBy: [],
     comments: [
         { id: 'comment-3-1', userId: 'user-2', text: "This is unacceptable.", createdAt: '2024-07-22T19:00:00Z' },
@@ -109,7 +109,7 @@ export const complaints: Complaint[] = [
     longitude: 77.212,
     status: 'Received',
     submittedAt: '2024-07-23T08:00:00Z',
-    beforeImageUrls: ['https://picsum.photos/seed/broken-light/600/400'],
+    beforeImageUrls: ['https://images.unsplash.com/photo-1589895933610-37df9fed5654?q=80&w=600&h=400&fit=crop'],
     upvotedBy: ['user-1'],
     comments: []
   },
@@ -124,8 +124,8 @@ export const complaints: Complaint[] = [
     status: 'Resolved',
     submittedAt: '2024-07-10T15:20:00Z',
     resolvedAt: '2024-07-11T10:00:00Z',
-    beforeImageUrls: ['https://picsum.photos/seed/water-leak-sidewalk/600/400'],
-    afterImageUrl: 'https://picsum.photos/seed/dry-sidewalk/600/400',
+    beforeImageUrls: ['https://images.unsplash.com/photo-1565582343296-15b9c6a3824b?q=80&w=600&h=400&fit=crop'],
+    afterImageUrl: 'https://images.unsplash.com/photo-1541854615-53376def9693?q=80&w=600&h=400&fit=crop',
     feedback: {
         rating: 5,
         comment: "Resolved very quickly!"
